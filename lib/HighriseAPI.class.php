@@ -3,7 +3,7 @@
 	/*
 		* http://developer.37signals.com/highrise/people
 		* findPeopleByTagName
-		* findAllTags
+		* Add Notes support
 		* Get Company Name, etc proxy
 		* Add Tags to Person
 	*/
@@ -817,15 +817,18 @@
 						unset($this->original_tags[$tag->getId()]);
 					}
 				}
-
-				foreach($this->original_tags as $tag_id=>$v)
+				
+				if (is_array($this->original_tags))
 				{
-					if ($this->debug)
-						print "REMOVE TAG: " . $tag_id;
-					$new_tag_data = $this->postDataWithVerb("/people/" . $this->getId() . "/tags/" . $tag_id . ".xml", "", "DELETE");
-					$this->checkForErrors("Person (delete tag)", 200);
+					foreach($this->original_tags as $tag_id=>$v)
+					{
+						if ($this->debug)
+							print "REMOVE TAG: " . $tag_id;
+						$new_tag_data = $this->postDataWithVerb("/people/" . $this->getId() . "/tags/" . $tag_id . ".xml", "", "DELETE");
+						$this->checkForErrors("Person (delete tag)", 200);
+					}					
 				}
-
+				
 				foreach($this->tags as $tag_name => $tag)
 					$this->original_tags[$tag->getId()] = 1;	
 			}
