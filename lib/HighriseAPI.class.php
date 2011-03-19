@@ -2,11 +2,12 @@
 
 	/*
 		* http://developer.37signals.com/highrise/people
-		* Add Tags to Person
 		* findPeopleByTagName
+		* findAllTags
 		* Get Company Name, etc proxy
 		* Add Tags to Person
 	*/
+	
 	
 	class HighriseAPI
 	{
@@ -39,11 +40,12 @@
 
 		protected function postDataWithVerb($path, $request_body, $verb = "POST")
 		{
-
+			$this->curl = curl_init();
+			
 			$url = "https://" . $this->account . ".highrisehq.com" . $path;
 
 			if ($this->debug)
-				print "postDataWithVerb $url ============================\n";
+				print "postDataWithVerb $verb $url ============================\n";
 
 			
 			curl_setopt($this->curl, CURLOPT_URL,$url);
@@ -60,8 +62,9 @@
 							
 			if ($verb != "POST")
 			  curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, $verb);
- 
-
+ 			else
+				curl_setopt($this->curl, CURLOPT_POST, true);
+				
 			$ret = curl_exec($this->curl);
 			
 			if ($this->debug == true)
@@ -89,9 +92,12 @@
 			return $xml_object;
 		}
 		
-		protected function checkForErrors($type, $expected_status_code = 200)
+		protected function checkForErrors($type, $expected_status_codes = 200)
 		{
-			if ($this->getLastReturnStatus() != $expected_status_code)
+			if (!is_array($expected_status_codes))
+				$expected_status_codes = array($expected_status_codes);
+			
+			if (!in_array($this->getLastReturnStatus(), $expected_status_codes))
 			{
 				switch($this->getLastReturnStatus())
 				{
@@ -176,7 +182,7 @@
 			return $people;
 		}
 		
-		public function findPeoplSinceTime($time)
+		public function findPeopleSinceTime($time)
 		{
 			$url = "/people/search.xml?since=" . urlencode($time);
 			$people = $this->parsePeopleListing($url);
@@ -239,7 +245,6 @@
 			return $xml;
 		}
 		
-		
 		public function __toString()
 		{
 			return $this->name;
@@ -255,7 +260,6 @@
 		  return $this->name;
 		}
 
-		
 		public function setId($id)
 		{
 		  $this->id = (string)$id;
@@ -265,8 +269,6 @@
 		{
 		  return $this->id;
 		}
-
-		
 	}
 	
 	class HighriseEmailAddress 
@@ -363,8 +365,6 @@
 			$xml .= "</instant-messenger>\n";
 			return $xml;
 		}
-		
-		
 		
 		public function __toString()
 		{
@@ -468,7 +468,6 @@
 		  return $this->street;
 		}
 
-		
 		public function setState($state)
 		{
 		  $this->state = (string)$state;
@@ -479,7 +478,6 @@
 		  return $this->state;
 		}
 
-		
 		public function setLocation($location)
 		{
 			$valid_locations = array("Work", "Home", "Other");
@@ -495,7 +493,6 @@
 		  return $this->location;
 		}
 
-		
 		public function setCountry($country)
 		{
 		  $this->country = (string)$country;
@@ -506,7 +503,6 @@
 		  return $this->country;
 		}
 
-		
 		public function setCity($city)
 		{
 		  $this->city = (string)$city;
@@ -516,7 +512,6 @@
 		{
 		  return $this->city;
 		}
-
 		
 		public function setId($id)
 		{
@@ -767,6 +762,10 @@
 		public $instant_messengers;
 		public $twitter_accounts;
 
+		public $tags;
+		private $original_tags;
+		
+		
 
 		public function delete()
 		{
@@ -779,16 +778,80 @@
 			$person_xml = $this->toXML(false);
 			if ($this->getId() != null)
 			{
-				$this->postDataWithVerb("/people/" . $this->getId() . ".xml", $person_xml, "PUT");
+				$new_xml = $this->postDataWithVerb("/people/" . $this->getId() . ".xml?reload=true", $person_xml, "PUT");
 				$this->checkForErrors("Person");
 			}
 			else
 			{
-				$this->postDataWithVerb("/people.xml", $person_xml, "POST");
+				$new_xml = $this->postDataWithVerb("/people.xml", $person_xml, "POST");
 				$this->checkForErrors("Person", 201);
 			}
+			
+			// Reload object and add tags.
+				$tags = $this->tags;
+				$original_tags = $this->original_tags;
+				
+				$this->loadFromXMLObject(simplexml_load_string($new_xml));
+				$this->tags = $tags;
+				$this->original_tags = $original_tags;
+				$this->saveTags();
+			
+			return true;
 		}
 		
+		public function saveTags()
+		{
+			if (is_array($this->tags))
+			{
+				foreach($this->tags as $tag_name => $tag)
+				{
+					if ($tag->getId() == null) // New Tag
+					{
+					 	print "Adding Tag: " . $tag->getName() . "\n";
+
+						$new_tag_data = $this->postDataWithVerb("/people/" . $this->getId() . "/tags.xml", "<name>" . $tag->getName() . "</name>", "POST");
+						$this->checkForErrors("Person (add tag)", array(200, 201));
+						$new_tag_data = simplexml_load_string($new_tag_data);
+						$this->tags[$tag_name]->setId($new_tag_data->id);
+						unset($this->original_tags[$tag->getId()]);
+
+					}
+					else // Remove Tag from deletion list
+					{
+						unset($this->original_tags[$tag->getId()]);
+					}
+				}
+
+				foreach($this->original_tags as $tag_id=>$v)
+				{
+					print "REMOVE TAG: " . $tag_id;
+					$new_tag_data = $this->postDataWithVerb("/people/" . $this->getId() . "/tags/" . $tag_id . ".xml", "", "DELETE");
+					$this->checkForErrors("Person (delete tag)", 200);
+				}
+
+				foreach($this->tags as $tag_name => $tag)
+					$this->original_tags[$tag->getId()] = 1;
+				
+			}
+	
+		}
+
+		public function addTag($v)
+		{
+			if ($v instanceof HighriseTag && !isset($this->tags[$v->getName()]))
+			{
+				$this->tags[$v->getName()] = $v;
+				$this->original_tags[$v->getId()] = 1;
+				
+			}
+			elseif (!isset($this->tags[$v]))
+			{
+				$tag = new HighriseTag();
+				$tag->name = $v;
+				$this->tags[$v] = $tag;
+			}
+		}
+			
 		public function toXML($with_id = true)
 		{
 			$xml[] = "<person>";
@@ -848,7 +911,9 @@
 		
 		public function loadFromXMLObject($xml_obj)
 		{
-			// print_r($xml_obj);
+			if ($this->debug)
+				print_r($xml_obj);
+			
 			$this->setId($xml_obj->id);
 			$this->setFirstName($xml_obj->{'first-name'});
 			$this->setLastName($xml_obj->{'last-name'});
@@ -866,13 +931,16 @@
 		
 		public function loadTagsFromXMLObject($xml_obj)
 		{
+			$this->original_tags = array();
 			$this->tags = array();
+			
 			if (count($xml_obj->{'tag'}) > 0)
 			{
 				foreach($xml_obj->{'tag'} as $value)
 				{
 					$tag = new HighriseTag($value->{'id'}, $value->{'name'});
-					$this->tags[] = $tag;
+					$original_tags[$tag->getName()] = 1;	
+					$this->addTag($tag);
 				}
 			}
 		}
@@ -1007,7 +1075,7 @@
 		  return $this->company_id;
 		}
 		
-		public function setVisibleTo ($visible_to)
+		public function setVisibleTo($visible_to)
 		{
 			$valid_permissions = array("Everyone", "Owner");
 			$visible_to = ucwords(strtolower($visible_to));
@@ -1017,104 +1085,104 @@
 		  $this->visible_to = (string)$visible_to;
 		}
 
-		public function getVisibleTo ()
+		public function getVisibleTo()
 		{
 		  return $this->visible_to;
 		}
 
 		
-		public function setAuthorId ($author_id)
+		public function setAuthorId($author_id)
 		{
 		  $this->author_id = (string)$author_id;
 		}
 
-		public function getAuthorId ()
+		public function getAuthorId()
 		{
 		  return $this->author_id;
 		}
 	
-		public function setUpdatedAt ($updated_at)
+		public function setUpdatedAt($updated_at)
 		{
 		  $this->updated_at = (string)$updated_at;
 		}
 
-		public function getUpdatedAt ()
+		public function getUpdatedAt()
 		{
 		  return $this->updated_at;
 		}
 
 		
-		public function setCreatedAt ($created_at)
+		public function setCreatedAt($created_at)
 		{
 		  $this->created_at = (string)$created_at;
 		}
 
-		public function getCreatedAt ()
+		public function getCreatedAt()
 		{
 		  return $this->created_at;
 		}
 
 		
-		public function setCompanyName ($company_name)
+		public function setCompanyName($company_name)
 		{
 		  $this->company_name = (string)$company_name;
 		}
 
-		public function getCompanyName ()
+		public function getCompanyName()
 		{
 		  return $this->company_name;
 		}
 
 		
-		public function setBackground ($background)
+		public function setBackground($background)
 		{
 		  $this->background = (string)$background;
 		}
 
-		public function getBackground ()
+		public function getBackground()
 		{
 		  return $this->background;
 		}
 
 		
-		public function setLastName ($last_name)
+		public function setLastName($last_name)
 		{
 		  $this->last_name = (string)$last_name;
 		}
 
-		public function getLastName ()
+		public function getLastName()
 		{
 		  return $this->last_name;
 		}
 
 		
-		public function setFirstName ($first_name)
+		public function setFirstName($first_name)
 		{
 		  $this->first_name = (string)$first_name;
 		}
 
-		public function getFirstName ()
+		public function getFirstName()
 		{
 		  return $this->first_name;
 		}
 
-		public function setTitle ($title)
+		public function setTitle($title)
 		{
 		  $this->title = (string)$title;
 		}
 
-		public function getTitle ()
+		public function getTitle()
 		{
 		  return $this->title;
 		}
 
 		
-		public function setId ($id)
+		public function setId($id)
 		{
 		  $this->id = (string)$id;
 		}
 
-		public function getId ()
+		public function getId()
 		{
 		  return $this->id;
 		}
