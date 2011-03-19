@@ -4,6 +4,7 @@
 		* http://developer.37signals.com/highrise/people
 		* findPeopleByTagName
 		* Add Notes support
+		* Add Tasks support
 		* Get Company Name, etc proxy
 		* Add Tags to Person
 	*/
