@@ -1,3 +1,7 @@
 Highrise-PHP-Api is a project (currently in alpha) to provide easy access to 37signals' Highrise API to PHP Developers.
 
 Documentation is coming soon, please check the test directory for examples.
+
+This PHP Class currently allow CRUD support for People objects only. Support for other object types will be uploaded shortly.
+
+
