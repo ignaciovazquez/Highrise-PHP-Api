@@ -132,6 +132,21 @@
 			return $person;
 		}
 		
+		public function findAllTags()
+		{
+			$xml = $this->getUrl("/tags.xml");
+			$this->checkForErrors("Tags");
+			
+			$xml_object = simplexml_load_string($xml);			
+			$ret = array();
+			foreach($xml_object->tag as $tag)
+			{
+				$ret[(string)$tag->name] = new HighriseTag((string)$tag->id, (string)$tag->name);
+			}
+			
+			return $ret;
+		}
+		
 		public function findAllPeople()
 		{
 			return $this->parsePeopleListing("/people.xml");	
@@ -325,8 +340,6 @@
 		  return $this->location;
 		}
 
-		
-		
 		public function setId($id)
 		{
 		  $this->id = (string)$id;
@@ -337,8 +350,7 @@
 		  return $this->id;
 		}	
 	}
-	
-	
+		
 	class HighriseInstantMessenger
 	{
 		public $id;
@@ -409,7 +421,6 @@
 		{
 		  return $this->location;
 		}
-
 		
 		public function setId($id)
 		{
@@ -419,10 +430,9 @@
 		public function getId()
 		{
 		  return $this->id;
-		}
-
-		
+		}	
 	}
+	
 	class HighriseAddress
 	{
 		public $id;
@@ -547,8 +557,7 @@
 			$xml .= "</phone-number>\n";
 			return $xml;
 		}
-		
-		
+				
 		public function setLocation ($location)
 		{
 			$valid_locations = array("Work", "Mobile", "Fax", "Pager", "Home", "Skype", "Other");
@@ -563,7 +572,6 @@
 		{
 		  return $this->location;
 		}
-
 		
 		public function setNumber ($number)
 		{
@@ -589,8 +597,7 @@
 		public function __toString()
 		{
 			return $this->number;
-		}
-		
+		}	
 	}
 	
 	class HighriseWebAddress
@@ -626,7 +633,6 @@
 		{
 		  return $this->url;
 		}
-
 		
 		public function setLocation($location)
 		{
@@ -642,7 +648,6 @@
 		{
 		  return $this->location;
 		}
-
 		
 		public function setId($id)
 		{
@@ -652,10 +657,7 @@
 		public function getId()
 		{
 		  return $this->id;
-		}
-
-		
-		
+		}	
 	}
 	
 	class HighriseTwitterAccount
@@ -663,7 +665,6 @@
 		public $id;
 		public $location;
 		public $username;
-		
 		
 		public function __construct($id = null, $username = null, $location = null)
 		{
@@ -704,7 +705,6 @@
 		  return $this->username;
 		}
 
-		
 		public function setLocation($location)
 		{
 			$valid_locations = array("Business", "Personal", "Other");
@@ -720,7 +720,6 @@
 		  return $this->location;
 		}
 
-		
 		public function setId($id)
 		{
 		  $this->id = (string)$id;
@@ -729,14 +728,11 @@
 		public function getId()
 		{
 		  return $this->id;
-		}
-
-		
+		}		
 	}
 	
 	class HighrisePerson extends HighriseAPI
 	{
-		
 		public $id;
 		public $title;
 		public $first_name;
@@ -765,8 +761,6 @@
 		public $tags;
 		private $original_tags;
 		
-		
-
 		public function delete()
 		{
 			$this->postDataWithVerb("/people/" . $this->getId() . ".xml", "", "DELETE");
@@ -807,7 +801,9 @@
 				{
 					if ($tag->getId() == null) // New Tag
 					{
-					 	print "Adding Tag: " . $tag->getName() . "\n";
+					 	
+						if ($this->debug)
+							print "Adding Tag: " . $tag->getName() . "\n";
 
 						$new_tag_data = $this->postDataWithVerb("/people/" . $this->getId() . "/tags.xml", "<name>" . $tag->getName() . "</name>", "POST");
 						$this->checkForErrors("Person (add tag)", array(200, 201));
@@ -824,16 +820,15 @@
 
 				foreach($this->original_tags as $tag_id=>$v)
 				{
-					print "REMOVE TAG: " . $tag_id;
+					if ($this->debug)
+						print "REMOVE TAG: " . $tag_id;
 					$new_tag_data = $this->postDataWithVerb("/people/" . $this->getId() . "/tags/" . $tag_id . ".xml", "", "DELETE");
 					$this->checkForErrors("Person (delete tag)", 200);
 				}
 
 				foreach($this->tags as $tag_name => $tag)
-					$this->original_tags[$tag->getId()] = 1;
-				
+					$this->original_tags[$tag->getId()] = 1;	
 			}
-	
 		}
 
 		public function addTag($v)
@@ -871,7 +866,6 @@
 				$xml_field_name = str_replace("_", "-", $field);
 				$xml[] = "\t<" . $xml_field_name . ">" . $this->$field . "</" . $xml_field_name . ">";
 			}
-			
 			
 			foreach($optional_fields as $field)
 			{
@@ -961,7 +955,6 @@
 					$this->phone_numbers[] = $number;
 				}				
 			}
-			
 
 			if (isset($xml_obj->{'email-addresses'}))
 			{			
@@ -1044,8 +1037,7 @@
 			
 			$this->web_addresses[] = $item;
 		}
-
-
+		
 		public function addInstantMessenger($protocol, $address, $location = "Personal")
 		{
 			$item = new HighriseInstantMessenger();
@@ -1089,7 +1081,6 @@
 		{
 		  return $this->visible_to;
 		}
-
 		
 		public function setAuthorId($author_id)
 		{
@@ -1110,7 +1101,6 @@
 		{
 		  return $this->updated_at;
 		}
-
 		
 		public function setCreatedAt($created_at)
 		{
@@ -1122,7 +1112,6 @@
 		  return $this->created_at;
 		}
 
-		
 		public function setCompanyName($company_name)
 		{
 		  $this->company_name = (string)$company_name;
@@ -1133,7 +1122,6 @@
 		  return $this->company_name;
 		}
 
-		
 		public function setBackground($background)
 		{
 		  $this->background = (string)$background;
@@ -1155,7 +1143,6 @@
 		  return $this->last_name;
 		}
 
-		
 		public function setFirstName($first_name)
 		{
 		  $this->first_name = (string)$first_name;

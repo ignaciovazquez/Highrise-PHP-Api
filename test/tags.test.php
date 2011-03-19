@@ -47,8 +47,14 @@ print "Find People named Tag Tagger:\n";
 $people = $hr->findPeopleBySearchTerm("Tag Tagger");
 print_r($people);
 
+print "Find all tags...";
+
+$all_tags = $hr->findAllTags();
+print_r($all_tags);
+
 print "Cleaning up...\n";
 foreach($people as $p)
 {
 	$p->delete();
 }
+
