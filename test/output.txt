@@ -1,0 +1,124 @@
+SimpleXMLElement Object
+(
+    [author-id] => 434309
+    [background] => SimpleXMLElement Object
+        (
+            [@attributes] => Array
+                (
+                    [nil] => true
+                )
+
+        )
+
+    [company-id] => SimpleXMLElement Object
+        (
+            [@attributes] => Array
+                (
+                    [type] => integer
+                    [nil] => true
+                )
+
+        )
+
+    [created-at] => 2011-03-19T20:51:23Z
+    [first-name] => Tag
+    [group-id] => SimpleXMLElement Object
+        (
+            [@attributes] => Array
+                (
+                    [type] => integer
+                    [nil] => true
+                )
+
+        )
+
+    [id] => 64882838
+    [last-name] => Tagger
+    [owner-id] => 434309
+    [title] => SimpleXMLElement Object
+        (
+            [@attributes] => Array
+                (
+                    [nil] => true
+                )
+
+        )
+
+    [updated-at] => 2011-03-19T20:51:25Z
+    [visible-to] => Owner
+    [tags] => SimpleXMLElement Object
+        (
+            [@attributes] => Array
+                (
+                    [type] => array
+                )
+
+            [tag] => SimpleXMLElement Object
+                (
+                    [id] => 1336067
+                    [name] => tag-1
+                )
+
+        )
+
+    [contact-data] => SimpleXMLElement Object
+        (
+            [phone-numbers] => SimpleXMLElement Object
+                (
+                    [@attributes] => Array
+                        (
+                            [type] => array
+                        )
+
+                )
+
+            [addresses] => SimpleXMLElement Object
+                (
+                    [@attributes] => Array
+                        (
+                            [type] => array
+                        )
+
+                )
+
+            [email-addresses] => SimpleXMLElement Object
+                (
+                    [@attributes] => Array
+                        (
+                            [type] => array
+                        )
+
+                )
+
+            [web-addresses] => SimpleXMLElement Object
+                (
+                    [@attributes] => Array
+                        (
+                            [type] => array
+                        )
+
+                )
+
+            [instant-messengers] => SimpleXMLElement Object
+                (
+                    [@attributes] => Array
+                        (
+                            [type] => array
+                        )
+
+                )
+
+            [twitter-accounts] => SimpleXMLElement Object
+                (
+                    [@attributes] => Array
+                        (
+                            [type] => array
+                        )
+
+                )
+
+        )
+
+)
+Adding a new person...
+postDataWithVerb POST https://dormsba.highrisehq.com/people.xml ============================
