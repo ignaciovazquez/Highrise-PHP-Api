@@ -2,13 +2,15 @@
 
 	/*
 		* http://developer.37signals.com/highrise/people
-		* findPeopleByTagName
-		* Add Notes support
+		*
+		* TODO LIST:
 		* Add Tasks support
+		* Get comments for Notes / Emails
+		* findPeopleByTagName
 		* Get Company Name, etc proxy
+		* Convenience methods for saving Notes $person->saveNotes() to check if notes were modified, etc.
 		* Add Tags to Person
 	*/
-	
 	
 	class HighriseAPI
 	{
@@ -70,6 +72,7 @@
 			
 			if ($this->debug == true)
 				print "Begin Request Body ============================\n" . $request_body . "End Request Body ==============================\n";
+			
 			curl_setopt($this->curl,CURLOPT_HTTPGET, true);
 			
 			return $ret;
@@ -77,8 +80,26 @@
 		
 		protected function getURL($path)
 		{
-			curl_setopt($this->curl,CURLOPT_URL,"https://" . $this->account . ".highrisehq.com" . $path);
-			return curl_exec($this->curl);
+			curl_setopt($this->curl, CURLOPT_HTTPHEADER, array('Accept: application/xml', 'Content-Type: application/xml'));
+		  curl_setopt($this->curl, CURLOPT_USERPWD,$this->token.':x');
+			curl_setopt($this->curl, CURLOPT_SSL_VERIFYPEER,0);
+			curl_setopt($this->curl, CURLOPT_SSL_VERIFYHOST,0);
+			curl_setopt($this->curl, CURLOPT_RETURNTRANSFER,true);
+
+			$url = "https://" . $this->account . ".highrisehq.com" . $path;
+	
+			if ($this->debug == true)
+				curl_setopt($this->curl, CURLOPT_VERBOSE, true);
+	
+				
+			curl_setopt($this->curl,CURLOPT_URL,$url);
+			$response = curl_exec($this->curl);
+
+			if ($this->debug == true)
+				print "Response: =============\n" . $response . "============\n";
+		
+			return $response;
+			
 		}
 		
 		protected function getLastReturnStatus()
@@ -113,10 +134,113 @@
 						break;
 					
 					default:
-						throw new Exception("API for $type returned Status Code: " . $this->getLastReturnStatus() . " Expected Code: $expected_status_code");
+						throw new Exception("API for $type returned Status Code: " . $this->getLastReturnStatus() . " Expected Code: " . implode(",", $expected_status_codes));
 						break;
 				}				
 			}
+		}
+		
+		/* Users */
+		
+		public function findAllUsers()
+		{
+			$xml = $this->getUrl("/users.xml");
+			$this->checkForErrors("User");
+			
+			$xml_object = simplexml_load_string($xml);
+			
+			$ret = array();
+			foreach($xml_object->user as $xml_user)
+			{
+				$user = new HighriseUser();
+				$user->loadFromXMLObject($xml_user);
+				$ret[] = $user;
+			}
+			
+			return $ret;
+		}
+		
+		public function findMe()
+		{
+			$xml = $this->getUrl("/me.xml");
+			$this->checkForErrors("User");
+			
+			$xml_obj = simplexml_load_string($xml);
+			$user = new HighriseUser();
+			$user->loadFromXMLObject($xml_obj);
+			return $user;
+		}
+		
+		/* Tasks */
+		
+		public function findCompletedTasks()
+		{
+			$xml = $this->getUrl("/tasks/completed.xml");
+			$this->checkForErrors("Tasks");
+			return $this->parseTasks($xml);
+		}
+
+		public function findAssignedTasks()
+		{
+			$xml = $this->getUrl("/tasks/assigned.xml");
+			$this->checkForErrors("Tasks");
+			return $this->parseTasks($xml);
+		}
+
+		
+		public function findUpcomingTasks()
+		{
+			$xml = $this->getUrl("/tasks/upcoming.xml");
+			$this->checkForErrors("Tasks");
+			return $this->parseTasks($xml);
+		}
+
+		private function parseTasks($xml)
+		{
+			$xml_object = simplexml_load_string($xml);			
+			$ret = array();
+			foreach($xml_object->task as $xml_task)
+			{
+				$task = new HighriseTask($this);
+				$task->loadFromXMLObject($xml_task);
+				$ret[] = $task;
+			}
+
+			return $ret;
+		
+		}
+		
+		public function findTaskById($id)
+		{
+			$xml = $this->getURL("/tasks/$id.xml");
+			$this->checkForErrors("Task");
+			$task_xml = simplexml_load_string($xml);
+			$task = new HighriseTask($this);
+			$task->loadFromXMLObject($task_xml);
+			return $task;
+			
+		}
+		
+		/* Notes & Emails */
+
+		public function findEmailById($id)
+		{
+			$xml = $this->getURL("/emails/$id.xml");
+			$this->checkForErrors("Email");
+			$email_xml = simplexml_load_string($xml);
+			$email = new HighriseEmail($this);
+			$email->loadFromXMLObject($email_xml);
+			return $email;
+		}
+				
+		public function findNoteById($id)
+		{
+			$xml = $this->getURL("/notes/$id.xml");
+			$this->checkForErrors("Note");
+			$note_xml = simplexml_load_string($xml);
+			$note = new HighriseNote($this);
+			$note->loadFromXMLObject($note_xml);
+			return $note;
 		}
 		
 		public function findPersonById($id)
@@ -239,6 +363,704 @@
 		}
 		
 	}
+	
+	class HighriseUser
+	{
+		public $id;
+		public $name;
+		public $email_address;
+		public $token;
+		public $dropbox;
+		public $created_at;
+		public $updated_at;
+	
+	
+		public function loadFromXMLObject($xml_obj)
+		{
+			$this->setId($xml_obj->{'id'});
+			$this->setName($xml_obj->{'name'});
+			$this->setEmailAddress($xml_obj->{'email-address'});
+			$this->setToken($xml_obj->{'token'});
+			$this->setDropbox($xml_obj->{'dropbox'});
+			$this->setCreatedAt($xml_obj->{'created-at'});
+			$this->setUpdatedAt($xml_obj->{'updated-at'});
+				
+			return true;
+		}
+		
+		public function setUpdatedAt($updated_at)
+		{
+		  $this->updated_at = (string)$updated_at;
+		}
+
+		public function getUpdatedAt()
+		{
+		  return $this->updated_at;
+		}
+
+		public function setCreatedAt($created_at)
+		{
+		  $this->created_at = (string)$created_at;
+		}
+
+		public function getCreatedAt()
+		{
+		  return $this->created_at;
+		}
+
+		
+		public function setDropbox($dropbox)
+		{
+		  $this->dropbox = (string)$dropbox;
+		}
+
+		public function getDropbox()
+		{
+		  return $this->dropbox;
+		}
+
+		
+		public function setToken($token)
+		{
+		  $this->token = (string)$token;
+		}
+
+		public function getToken()
+		{
+		  return $this->token;
+		}
+
+		
+		public function setEmailAddress($email_address)
+		{
+		  $this->email_address = (string)$email_address;
+		}
+
+		public function getEmailAddress()
+		{
+		  return $this->email_address;
+		}
+
+		
+		public function setName($name)
+		{
+		  $this->name = (string)$name;
+		}
+
+		public function getName()
+		{
+		  return $this->name;
+		}
+
+		
+		public function setId($id)
+		{
+		  $this->id = (string)$id;
+		}
+
+		public function getId()
+		{
+		  return $this->id;
+		}
+
+		
+	}
+	
+	class HighriseTask extends HighriseAPI
+	{
+		private $highrise;
+		public $id;
+		public $author_id;
+		public $subject_id;
+		public $subject_type;
+		public $subject_name;
+		public $category_id;
+		public $body;
+		public $frame;
+		public $due_at;
+		public $alert_at;
+		public $created_at;
+		public $updated_at;
+		public $public;
+		public $recording_id;
+		public $notify;
+		public $owner_id;
+		public $deleted;
+		
+		public function complete()
+		{
+			$task_xml = $this->toXML();
+			$new_task_xml = $this->postDataWithVerb("/tasks/" . $this->getId() . "/complete.xml", "", "POST");
+			$this->checkForErrors("Task", 200);	
+			$this->loadFromXMLObject(simplexml_load_string($new_task_xml));
+			return true;	
+		}
+		
+		public function save()
+		{
+			if ($this->getFrame() == null)
+				throw new Exception("You need to specify a valid time frame to save a task");
+
+			if ($this->id == null) // Create
+			{
+				$task_xml = $this->toXML();
+				$new_task_xml = $this->postDataWithVerb("/tasks.xml", $task_xml, "POST");
+				$this->checkForErrors("Task", 201);	
+				$this->loadFromXMLObject(simplexml_load_string($new_task_xml));
+				return true;
+			}
+			else
+			{
+				$task_xml = $this->toXML();
+				$new_task_xml = $this->postDataWithVerb("/tasks/" . $this->getId() . ".xml", $task_xml, "PUT");
+				$this->checkForErrors("Task", 200);	
+				return true;	
+			}
+		}
+		
+		public function delete()
+		{
+			$this->postDataWithVerb("/tasks/" . $this->getId() . ".xml", "", "DELETE");
+			$this->checkForErrors("Task", 200);	
+			$this->deleted = true;
+		}
+		
+		public function assignToUser(HighriseUser $user)
+		{
+			$this->setOwnerId($user->getId());
+		}
+		
+		public function setOwnerId($owner_id)
+		{
+		  $this->owner_id = (string)$owner_id;
+		}
+
+		public function getOwnerId()
+		{
+		  return $this->owner_id;
+		}
+
+		
+		public function setNotify($notify)
+		{
+			if ($notify == "true" || $notify == true || $notify == 1)
+				$notify = true;
+			else
+				$notify = false;
+				
+		  $this->notify = (string)$notify;
+		}
+
+		public function getNotify()
+		{
+		  return $this->notify;
+		}
+
+		public function setRecordingId($recording_id)
+		{
+		  $this->recording_id = (string)$recording_id;
+		}
+
+		public function getRecordingId()
+		{
+		  return $this->recording_id;
+		}
+
+		public function setPublic($public)
+		{
+		  $this->public = (string)$public;
+		}
+
+		public function getPublic()
+		{
+		  return $this->public;
+		}
+
+		
+		
+		public function setUpdatedAt($updated_at)
+		{
+		  $this->updated_at = (string)$updated_at;
+		}
+
+		public function getUpdatedAt()
+		{
+		  return $this->updated_at;
+		}
+
+		
+		public function setCreatedAt($created_at)
+		{
+		  $this->created_at = (string)$created_at;
+		}
+
+		public function getCreatedAt()
+		{
+		  return $this->created_at;
+		}
+
+		
+		public function setAlertAt($alert_at)
+		{
+		  $this->alert_at = (string)$alert_at;
+		}
+
+		public function getAlertAt()
+		{
+		  return $this->alert_at;
+		}
+
+		
+		public function setDueAt($due_at)
+		{
+		  $this->due_at = (string)$due_at;
+		}
+
+		public function getDueAt()
+		{
+		  return $this->due_at;
+		}
+
+		
+		
+		public function setFrame($subject_type)
+		{
+			$valid_frames = array("today", "tomorrow", "this_week", "next_week", "later", "overdue");
+			$frame = str_replace(" ", "_", strtolower($subject_type));
+			
+			if ($frame != null && !in_array($frame, $valid_frames))
+				throw new Exception("$subject_type is not a valid frame. Available frames: " . implode(", ", $valid_frames));
+	
+		  $this->frame = (string)$frame;
+		}
+
+		public function getFrame()
+		{
+		  return $this->frame;
+		}
+
+		
+		public function setBody($body)
+		{
+		  $this->body = (string)$body;
+		}
+
+		public function getBody()
+		{
+		  return $this->body;
+		}
+
+		
+		public function setCategoryId($category_id)
+		{
+		  $this->category_id = (string)$category_id;
+		}
+
+		public function getCategoryId()
+		{
+		  return $this->category_id;
+		}
+
+		
+		public function setSubjectName($subject_name)
+		{
+		  $this->subject_name = (string)$subject_name;
+		}
+
+		public function getSubjectName()
+		{
+		  return $this->subject_name;
+		}
+
+		public function setSubjectType($subject_type)
+		{
+			$valid_types = array("Party", "Company", "Deal", "Kase");
+			$subject_type = ucwords(strtolower($subject_type));
+			if ($subject_type != null && !in_array($subject_type, $valid_types))
+				throw new Exception("$subject_type is not a valid subject type. Available subject types: " . implode(", ", $valid_types));
+	
+		  $this->subject_type = (string)$subject_type;
+		}
+		
+		public function setSubjectId($subject_id)
+		{
+		  $this->subject_id = (string)$subject_id;
+		}
+
+		public function getSubjectId()
+		{
+		  return $this->subject_id;
+		}
+
+		
+		public function setAuthorId($author_id)
+		{
+		  $this->author_id = (string)$author_id;
+		}
+
+		public function getAuthorId()
+		{
+		  return $this->author_id;
+		}
+
+		
+		public function setId($id)
+		{
+		  $this->id = (string)$id;
+		}
+
+		public function getId()
+		{
+		  return $this->id;
+		}
+
+		
+		public function toXML()
+		{
+			$xml  = "<task>\n";
+			if ($this->getId() != null)
+				$xml .= '<id type="integer">' . $this->getId() . "</id>\n";
+
+			if ($this->getRecordingId() != null)
+			{
+				$xml .= '<recording-id>' . $this->getSubjectId() . "</subject-id>\n";
+			}
+			
+			if ($this->getSubjectId() != null)
+			{
+				$xml .= '<subject-id>' . $this->getSubjectId() . "</subject-id>\n";
+				$xml .= '<subject-type>' . $this->getSubjectType() . "</subject-type>\n";
+			}
+			
+			$xml .= '<body>' . $this->getBody() . "</body>\n";
+			$xml .= '<frame>' . $this->getFrame() . "</frame>\n";
+			
+			if ($this->getCategoryId() != null)
+				$xml .= '<category-id>' . $this->getCategoryId() . "</category-id>\n";
+		
+			if ($this->getOwnerId() != null)	
+				$xml .= '<owner-id>' . $this->getOwnerId() . "</owner-id>\n";
+			
+			if ($this->getDueAt() != null)
+				$xml .= '<due-at>' . $this->getDueAt() . "</due-at>\n";
+			if ($this->getAlertAt() != null)
+				$xml .= '<alert-at>' . $this->getAlertAt() . "</alert-at>\n";
+			
+			if ($this->getPublic() != null)
+				$xml .= '<public type="boolean">' . ($this->getPublic() ? "true" : "false") . "</public>\n";
+			
+			if ($this->getNotify() != null)
+				$xml .= '<notify type="boolean">' . ($this->getNofity() ? "true" : "false") . "</notify>\n";
+			
+
+			$xml .= "</task>\n";
+			return $xml;
+		}		
+		
+		public function loadFromXMLObject($xml_obj)
+		{
+	
+			if ($this->debug)
+				print_r($xml_obj);
+
+			$this->setId($xml_obj->{'id'});
+			$this->setAuthorId($xml_obj->{'author-id'});
+			$this->setSubjectId($xml_obj->{'subject-id'});
+			$this->setSubjectType($xml_obj->{'subject-type'});
+			$this->setSubjectName($xml_obj->{'subject-name'});
+			$this->setCategoryId($xml_obj->{'category-id'});
+			$this->setBody($xml_obj->{'body'});
+			$this->setFrame($xml_obj->{'frame'});
+			$this->setDueAt($xml_obj->{'due-at'});
+			$this->setAlertAt($xml_obj->{'alert-at'});
+		
+			$this->setCreatedAt($xml_obj->{'created-at'});
+			$this->setUpdatedAt($xml_obj->{'updated-at'});
+			$this->setPublic(($xml_obj->{'public'} == "true"));
+			return true;
+		}
+
+		public function __construct(HighriseAPI $highrise)
+		{
+			$this->account = $highrise->account;
+			$this->token = $highrise->token;
+			$this->debug = $highrise->debug;
+			$this->curl = curl_init();		
+		}
+	}
+	
+	class HighriseEmail extends HighriseNote
+	{
+		public $title;
+		
+		public function setTitle($title)
+		{
+		  $this->title = (string)$title;
+		}
+
+		public function getTitle()
+		{
+		  return $this->title;
+		}
+
+		public function __construct(HighriseAPI $highrise)
+		{
+			parent::__construct($highrise);
+			$this->_note_type = "email";
+			$this->_note_url = "/emails";
+		}
+		
+		public function loadFromXMLObject($xml_obj)
+		{
+			if ($this->debug)
+				print_r($xml_obj);
+
+			$this->setId($xml_obj->{'id'});
+			$this->setAuthorId($xml_obj->{'author-id'});
+			$this->setOwnerId($xml_obj->{'owner-id'});
+			$this->setSubjectId($xml_obj->{'subject-id'});
+			$this->setSubjectType($xml_obj->{'subject-type'});
+			$this->setCreatedAt($xml_obj->{'created-at'});
+			$this->setUpdatedAt($xml_obj->{'updated-at'});
+			$this->setVisibleTo($xml_obj->{'visible-to'});
+			$this->setSubjectName($xml_obj->{'subject-name'});
+			$this->setTitle($xml_obj->{'title'});
+			$this->setBody($xml_obj->{'body'});
+
+			return true;
+		}
+	}
+	
+	class HighriseNote extends HighriseAPI
+	{
+		
+		protected $_note_type;
+		protected $_note_url;
+		
+		public $id;
+		public $author_id;
+		public $body;
+		public $created_at;
+		public $owner_id;
+		public $subject_id;
+		public $subject_type;
+		public $updated_at;
+		public $visible_to;
+		public $subject_name;
+		public $deleted;
+		
+		// public $group_id
+		// public $collection_id;
+		// public $collection_type;
+	
+		public function save()
+		{
+			if ($this->subject_type == null || $this->subject_id == null)
+			{
+				throw new Exception("Subject Type and Subject ID must be set in order to create a new " . $this->_note_type);
+			}
+
+			if ($this->id == null) // Create
+			{
+				$note_xml = $this->toXML();
+				$new_xml = $this->postDataWithVerb($this->_note_url . ".xml", $note_xml, "POST");
+				$this->checkForErrors(ucwords($this->_note_type), 201);	
+				$this->loadFromXMLObject(simplexml_load_string($new_xml));
+				return true;
+			}
+			else // Update
+			{
+				$note_xml = $this->toXML();
+				$new_xml = $this->postDataWithVerb($this->_note_url . "/" . $this->getId() . ".xml", $note_xml, "PUT");
+				$this->checkForErrors(ucwords($this->_note_type), 200);	
+				return true;
+			}
+		}
+		
+		public function delete()
+		{
+			$this->postDataWithVerb($this->_note_url . "/" . $this->getId() . ".xml", "", "DELETE");
+			$this->checkForErrors(ucwords($this->_note_type), 200);	
+			$this->deleted = true;
+		}
+	
+		public function loadFromXMLObject($xml_obj)
+		{
+			if ($this->debug)
+				print_r($xml_obj);
+
+			$this->setId($xml_obj->{'id'});
+			$this->setAuthorId($xml_obj->{'author-id'});
+			$this->setOwnerId($xml_obj->{'owner-id'});
+			$this->setSubjectId($xml_obj->{'subject-id'});
+			$this->setSubjectType($xml_obj->{'subject-type'});
+			$this->setCreatedAt($xml_obj->{'created-at'});
+			$this->setUpdatedAt($xml_obj->{'updated-at'});
+			$this->setVisibleTo($xml_obj->{'visible-to'});
+			$this->setSubjectName($xml_obj->{'subject-name'});
+			$this->setBody($xml_obj->{'body'});
+			
+			return true;
+		}
+
+
+		public function setSubjectName($subject_name)
+		{
+		  $this->subject_name = (string)$subject_name;
+		}
+
+		public function getSubjectName()
+		{
+		  return $this->subject_name;
+		}
+		
+		public function setVisibleTo($visible_to)
+		{
+		  $this->visible_to = (string)$visible_to;
+		}
+
+		public function getVisibleTo()
+		{
+		  return $this->visible_to;
+		}
+
+		
+		public function setUpdatedAt($updated_at)
+		{
+		  $this->updated_at = (string)$updated_at;
+		}
+
+		public function getUpdatedAt()
+		{
+		  return $this->updated_at;
+		}
+
+		
+		public function setSubjectType($subject_type)
+		{
+			$valid_types = array("Party", "Company", "Deal", "Kase");
+			$subject_type = ucwords(strtolower($subject_type));
+			if ($subject_type != null && !in_array($subject_type, $valid_types))
+				throw new Exception("$subject_type is not a valid subject type. Available subject types: " . implode(", ", $valid_types));
+	
+		  $this->subject_type = (string)$subject_type;
+		}
+
+		public function getSubjectType()
+		{
+		  return $this->subject_type;
+		}
+
+		public function setSubjectId($subject_id)
+		{
+		  $this->subject_id = (string)$subject_id;
+		}
+
+		public function getSubjectId()
+		{
+		  return $this->subject_id;
+		}
+
+		
+		public function setOwnerId($owner_id)
+		{
+		  $this->owner_id = (string)$owner_id;
+		}
+
+		public function getOwnerId()
+		{
+		  return $this->owner_id;
+		}
+
+		
+		public function setCreatedAt($created_at)
+		{
+		  $this->created_at = (string)$created_at;
+		}
+
+		public function getCreatedAt()
+		{
+		  return $this->created_at;
+		}
+
+		
+		public function setBody($body)
+		{
+		  $this->body = (string)$body;
+		}
+
+		public function getBody()
+		{
+		  return $this->body;
+		}
+
+		
+		public function setAuthorId($author_id)
+		{
+		  $this->author_id = (string)$author_id;
+		}
+
+		public function getAuthorId()
+		{
+		  return $this->author_id;
+		}
+
+		public function __construct(HighriseAPI $highrise)
+		{
+			$this->account = $highrise->account;
+			$this->token = $highrise->token;
+			$this->setVisibleTo("Everyone");
+			$this->debug = $highrise->debug;
+			$this->curl = curl_init();		
+			
+			$this->_note_type = "note";
+			$this->_note_url = "/notes";
+		}
+		
+		public function toXML()
+		{
+			$xml  = "<" . $this->_note_type . ">\n";
+			if ($this->getId() != null)
+				$xml .= '<id type="integer">' . $this->getId() . "</id>\n";
+			
+			if ($this->author_id)
+				$xml .= '<author-id>' . $this->getAuthorId() . "</author-id>\n";
+			
+			$xml .= '<body>' . $this->getBody() . "</body>\n";
+			
+			if ($this->owner_id)
+				$xml .= '<owner-id>' . $this->getOwnerId() . "</owner-id>\n";
+			
+			$xml .= '<subject-id>' . $this->getSubjectId() . "</subject-id>\n";
+			$xml .= '<subject-type>' . $this->getSubjectType() . "</subject-type>\n";
+			$xml .= '<visible-to>' . $this->getVisibleTo() . "</visible-to>\n";
+			
+			if (isset($this->title)) // Email
+				$xml .= '<title>' . $this->getTitle() . "</title>\n";
+			
+			// $xml .= '<subject-name>' . $this->getSubjectName() . "</subject-name>\n";
+			
+			$xml .= "</" . $this->_note_type . ">\n";
+			return $xml;
+		}
+		
+		public function __toString()
+		{
+			return $this->id;
+		}
+		
+
+		public function setId($id)
+		{
+		  $this->id = (string)$id;
+		}
+
+		public function getId()
+		{
+		  return $this->id;
+		}
+	}
+	
 	
 	class HighriseTag
 	{
@@ -762,6 +1584,65 @@
 		public $tags;
 		private $original_tags;
 		
+		public $notes;
+		public $emails;
+		
+		
+		public function addEmail(HighriseEmail $email)
+		{
+			$this->emails[$email->id] = $email;
+			
+		}
+		
+		public function getEmails()
+		{
+			$this->emails = array();
+			$xml = $this->getURL("/people/" . $this->id . "/emails.xml");
+			$xml_obj = simplexml_load_string($xml);
+
+			if ($this->debug == true);
+				print_r($xml_obj);
+			
+			if (isset($xml_obj->email) && count($xml_obj->email) > 0)
+			{
+				foreach($xml_obj->email as $xml_email)
+				{
+					$email = new HighriseEmail($this->highrise);
+					$email->loadFromXMLObject($xml_email);
+					$this->addEmail($email);		
+				}
+			}
+			
+			return $this->emails;
+		}
+		
+		public function addNote(HighriseNote $note)
+		{
+			$this->notes[$note->id] = $note;
+		}
+		
+		public function getNotes()
+		{
+			$this->notes = array();
+			$xml = $this->getURL("/people/" . $this->id . "/notes.xml");
+			$xml_obj = simplexml_load_string($xml);
+
+			if ($this->debug == true);
+				print_r($xml_obj);
+			
+			if (isset($xml_obj->note) && count($xml_obj->note) > 0)
+			{
+				foreach($xml_obj->note as $xml_note)
+				{
+					$note = new HighriseNote($this->highrise);
+					$note->loadFromXMLObject($xml_note);
+					$this->addNote($note);		
+				}
+			}
+			
+			return $this->notes;
+		}
+		
 		public function delete()
 		{
 			$this->postDataWithVerb("/people/" . $this->getId() . ".xml", "", "DELETE");
@@ -1180,6 +2061,7 @@
 
 		public function __construct(HighriseAPI $highrise)
 		{
+			$this->highrise = $highrise;
 			$this->account = $highrise->account;
 			$this->token = $highrise->token;
 			$this->setVisibleTo("Everyone");
