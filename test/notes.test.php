@@ -2,7 +2,7 @@
 require_once("../lib/HighriseAPI.class.php");
 
 if (count($argv) != 3)
-	die("Usage: php tags.test.php [account-name] [access-token]\n");
+	die("Usage: php notes.test.php [account-name] [access-token]\n");
 
 $hr = new HighriseAPI();
 $hr->debug = false;
