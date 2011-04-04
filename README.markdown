@@ -23,15 +23,15 @@ Create a new person
 ------ - --- ------
 
 	$person = new HighrisePerson($highrise);
-	$person->setFirstName("Personality");
-	$person->setLastName("Changer");
-	$person->addEmailAddress("personalityc@gmail.com");
+	$person->setFirstName("John");
+	$person->setLastName("Doe");
+	$person->addEmailAddress("johndoe@gmail.com");
 	$person->save();
 
 Find People by Search Term
 ---- ------ -- ------ ----
 
-	$people = $highrise->findPeopleBySearchTerm("Search Term");
+	$people = $highrise->findPeopleBySearchTerm("John");
 	foreach($people as $p)
 		print $person->getFirstName() . "\n";
 
