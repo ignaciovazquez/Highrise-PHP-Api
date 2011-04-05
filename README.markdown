@@ -35,6 +35,24 @@ Find People by Search Term
 	foreach($people as $p)
 		print $person->getFirstName() . "\n";
 
+Print all notes
+----- --- -----
+
+	foreach($highrise->findAllPeople() as $person)
+	{
+		print_r($person->getNotes());
+	}
+	
+Create a new note
+------ - --- ----
+
+	$note = new HighriseNote($highrise);
+	$note->setSubjectType("Party");
+	$note->setSubjectId($person->getId());
+	$note->setBody("Test");
+	$note->save();
+	
+	
 Add tags
 --- ----
 
@@ -85,6 +103,19 @@ Assign all upcoming tasks
 Find all assigned tasks
 ---- --- -------- -----
 
-	$assigned_tasks = $hr->findAssignedTasks();
+	$assigned_tasks = $highrise->findAssignedTasks();
 	print_r($assigned_tasks);
+
+Find all users
+---- --- -----
+
+	$users = $highrise->findAllUsers();
+	print_r($users);
+	
+Find current user
+---- ------- ----
+
+	$me = $highrise->findMe();
+
+
 

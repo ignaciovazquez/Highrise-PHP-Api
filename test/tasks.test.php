@@ -37,8 +37,10 @@ $completed_tasks = $hr->findCompletedTasks();
 foreach($completed_tasks as $completed_task)
 {
 	if ($completed_task->getId() == $task->getId())
+	{
 		$found_completed = true;
-	$completed_task->delete();
+		$completed_task->delete();
+	}
 }
 
 if (!isset($found_completed))
@@ -71,9 +73,10 @@ print_r($assigned_tasks);
 foreach($assigned_tasks as $a_task)
 {
 	if ($a_task->getId() == $assigned_task->getId())
+	{
 		$found_assigned = true;
-	
-	$a_task->delete(); 
+		$a_task->delete(); 
+	}
 }
 
 if (!isset($found_assigned))
@@ -86,10 +89,10 @@ foreach($tasks as $task)
 	if ($task->body == "Task Body2")
 	{
 		$found_one = true;
+		$task->delete();
+		
 	}
-	$task->delete();
 }
-
 
 if (!isset($found_one))
 	throw new Exception("Couldn't find the right task");
