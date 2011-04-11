@@ -2047,6 +2047,10 @@
 		}
 
 		
+		public function getFullName()
+		{
+			return $this->getFirstName() . " " . $this->getLastName();
+		}
 		public function setLastName($last_name)
 		{
 		  $this->last_name = (string)$last_name;
