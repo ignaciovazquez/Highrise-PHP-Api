@@ -277,6 +277,28 @@
 			return $this->parsePeopleListing("/people.xml");	
 		}
 		
+		public function findPeopleByTagName($tag_name)
+		{
+			$tags = $this->findAllTags();
+			foreach($tags as $tag)
+			{
+				if ($tag->name == $tag_name)
+					$tag_id = $tag->id;
+			}
+			
+			if (!isset($tag_id))
+				throw new Excepcion("Tag $tag_name not found");
+			
+			return $this->findPeopleByTagId($tag_id);
+		}
+		
+		public function findPeopleByTagId($tag_id)
+		{
+			$url = "/people.xml?tag_id=" . $tag_id;
+			$people = $this->parsePeopleListing($url);
+			return $people;	
+		}
+		
 		public function findPeopleByEmail($email)
 		{
 		 return $this->findPeopleBySearchCriteria(array("email"=>$email));
