@@ -1904,6 +1904,11 @@
 			}
 		}
 		
+		public function addAddress(HighriseAddress $address)
+		{
+			$this->addresses[] = $address;
+		}
+		
 		public function addEmailAddress($address, $location = "Home")
 		{
 			$item = new HighriseEmailAddress();
