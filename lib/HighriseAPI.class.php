@@ -312,13 +312,7 @@
 			return $people;
 		}
 
-		public function findPeopleByTagId($tag_id)
-		{
-			$url = "/people.xml?tag_id=" . urlencode($tag_id);
-			
-			$people = $this->parsePeopleListing($url);
-			return $people;
-		}
+
 		
 		public function findPeopleByCompanyId($company_id)
 		{
