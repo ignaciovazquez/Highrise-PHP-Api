@@ -277,6 +277,11 @@
 			return $this->parsePeopleListing("/people.xml");	
 		}
 		
+		public function findPeopleByEmail($email)
+		{
+		 return $this->findPeopleBySearchCriteria(array("email"=>$email));
+		}
+		
 		public function findPeopleByTitle($title)
 		{
 			$url = "/people.xml?title=" . urlencode($title);
@@ -1618,6 +1623,9 @@
 		
 		public function addNote(HighriseNote $note)
 		{
+			$note->setSubjectId($this->id);
+			$note->setSubjectType("Party");
+			$note->save();
 			$this->notes[$note->id] = $note;
 		}
 		
