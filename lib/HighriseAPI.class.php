@@ -1302,6 +1302,40 @@
 			return $xml;
 		}
 		
+		public function __toString()
+		{
+			$return = "";
+			if ($this->getStreet() != "" && $this->getStreet() != null)
+			{
+				$return .= $this->getStreet(). ", ";
+			}
+			
+			if ($this->getCity() != "" && $this->getCity() != null)
+			{
+				$return .= $this->getCity(). ", ";
+			}
+
+			if ($this->getState() != "" && $this->getState() != null)
+			{
+				$return .= $this->getState(). ", ";
+			}
+
+			if ($this->getZip() != "" && $this->getZip() != null)
+			{
+				$return .= $this->getZip(). ", ";
+			}
+
+			if ($this->getCountry() != "" && $this->getCountry() != null)
+			{
+				$return .= $this->getCountry(). ".";
+			}
+			
+			if (substr($return, -2) == ", ")
+				$return = substr($return, 0, -2);
+				
+			return $return;
+		}
+		
 		public function setZip($zip)
 		{
 		  $this->zip = (string)$zip;
