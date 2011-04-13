@@ -1608,7 +1608,36 @@
 		public $notes;
 		public $emails;
 		
+		public function getEmailAddresses()
+		{
+			return $this->email_addresses;
+		}
+
+		public function getPhoneNumbers()
+		{
+			return $this->phone_numbers;
+		}
+
+		public function getAddresses()
+		{
+			return $this->addresses;
+		}
+
+		public function getWebAddresses()
+		{
+			return $this->web_addresses;
+		}
+
+		public function getInstantMessengers()
+		{
+			return $this->instant_messengers;
+		}
 		
+		public function getTwitterAccounts()
+		{
+			return $this->twitter_accounts;
+		}
+
 		public function addEmail(HighriseEmail $email)
 		{
 			$this->emails[$email->id] = $email;
