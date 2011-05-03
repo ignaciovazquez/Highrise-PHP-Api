@@ -19,7 +19,7 @@ Features currently implemented:
 Examples
 ========
 
-Create a new person and set its address
+Create a new person and set his address
 ------ - --- ------ --- --- --- -------
 
 	$person = new HighrisePerson($highrise);
