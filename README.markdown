@@ -2,7 +2,7 @@ Highrise-PHP-Api is a project (currently in alpha) to provide easy access to 37s
 
 Documentation is coming soon, please check the test directory for examples.
 
-This PHP Class currently allow CRUD support for People objects only. Support for other object types will be uploaded shortly.
+This PHP Class currently allows CRUD support for People objects only. Support for other object types will be uploaded shortly.
 
 Please mind the tests are only supposed to run in a blank Highrise account and not on a live one.
 
@@ -19,13 +19,21 @@ Features currently implemented:
 Examples
 ========
 
-Create a new person
------- - --- ------
+Create a new person and set its address
+------ - --- ------ --- --- --- -------
 
 	$person = new HighrisePerson($highrise);
 	$person->setFirstName("John");
 	$person->setLastName("Doe");
 	$person->addEmailAddress("johndoe@gmail.com");
+	
+	$address = new HighriseAddress();
+	$address->setAddress("165 Test St.");
+	$address->setCity("Glasgow");
+	$address->setCountry("Scotland");
+	$address->setZip("GL1");
+	$person->addAddress($address);
+	
 	$person->save();
 
 Find People by Search Term

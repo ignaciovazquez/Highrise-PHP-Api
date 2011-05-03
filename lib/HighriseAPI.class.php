@@ -1304,6 +1304,11 @@
 		
 		public function __toString()
 		{
+			return $this->getFullAddress();
+		}
+
+		public function getFullAddress()
+		{
 			$return = "";
 			if ($this->getStreet() != "" && $this->getStreet() != null)
 			{
