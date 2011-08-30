@@ -702,7 +702,12 @@
 	
 		  $this->subject_type = (string)$subject_type;
 		}
-		
+
+                public function getSubjectType()
+                {
+                  return $this->subject_type;
+                }
+	
 		public function setSubjectId($subject_id)
 		{
 		  $this->subject_id = (string)$subject_id;
