@@ -43,7 +43,6 @@
 
 		protected function postDataWithVerb($path, $request_body, $verb = "POST")
 		{
-                  print_r($this);
 			$this->curl = curl_init();
 			
 			$url = "https://" . $this->account . ".highrisehq.com" . $path;
