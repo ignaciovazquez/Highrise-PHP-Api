@@ -2693,7 +2693,7 @@
 		  return $this->owner_id;
 		}
 		
-		public function setGroupId($author_id)
+		public function setGroupId($group_id)
 		{
 		  $this->group_id = (string)$group_id;
 		}
