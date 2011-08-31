@@ -10,6 +10,11 @@ $highrise->debug = false;
 $highrise->setAccount($argv[1]);
 $highrise->setToken($argv[2]);
 
+$companies = $highrise->findCompaniesByName("Test Company");
+foreach ($companies as $c) {
+  print_r ($c);
+}
+
 $companies = $highrise->findAllCompanies();
 foreach ($companies as $c) {
   print_r ($c);

@@ -411,6 +411,13 @@
 			return $companies;
 		}
 
+		public function findCompaniesByName($name)
+		{
+			$url = "/companies/search.xml?" . urlencode('[criteria]name=' . $name);
+			$companies = $this->parseCompanyListing($url, 25);
+			return $companies;
+		}
+
 		public function parseCompanyListing($url, $paging_results = 500)
 		{
 			if (strstr($url, "?"))
