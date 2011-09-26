@@ -404,6 +404,16 @@
 			return $ret;
 		}
 
+		public function findCompanyById($id)
+		{
+			$xml = $this->getURL("/companies/$id.xml");
+			$this->checkForErrors("Company");
+			$company_xml = simplexml_load_string($xml);
+			$company = new HighriseCompany($this);
+			$company->loadFromXMLObject($company_xml);
+			return $company;
+		}
+
 		public function findCompaniesBySearchTerm($search_term)
 		{
 			$url = "/companies/search.xml?term=" . urlencode($search_term);
