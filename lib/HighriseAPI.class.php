@@ -1900,6 +1900,7 @@
 			$this->setCreatedAt($xml_obj->{'created-at'});
 			$this->setUpdatedAt($xml_obj->{'updated-at'});
 			$this->setCompanyId($xml_obj->{'company-id'});
+			$this->setCompanyName($xml_obj->{'company-name'});
 			
 			$this->loadContactDataFromXMLObject($xml_obj->{'contact-data'});
 			$this->loadTagsFromXMLObject($xml_obj->{'tags'});	
