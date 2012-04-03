@@ -776,7 +776,7 @@
 				$xml .= '<public type="boolean">' . ($this->getPublic() ? "true" : "false") . "</public>\n";
 			
 			if ($this->getNotify() != null)
-				$xml .= '<notify type="boolean">' . ($this->getNofity() ? "true" : "false") . "</notify>\n";
+				$xml .= '<notify type="boolean">' . ($this->getNotify() ? "true" : "false") . "</notify>\n";
 			
 
 			$xml .= "</task>\n";
