@@ -1632,6 +1632,173 @@
 		public $author_id;
 		public $visible_to;
 
+		// contact-data
+
+		public $email_addresses;
+		public $phone_numbers;
+		public $addresses;
+		public $web_addresses;
+		public $instant_messengers;
+		public $twitter_accounts;
+
+		public function getEmailAddresses()
+		{
+			return $this->email_addresses;
+		}
+
+		public function getPhoneNumbers()
+		{
+			return $this->phone_numbers;
+		}
+
+		public function getAddresses()
+		{
+			return $this->addresses;
+		}
+
+		public function getWebAddresses()
+		{
+			return $this->web_addresses;
+		}
+
+		public function getInstantMessengers()
+		{
+			return $this->instant_messengers;
+		}
+
+		public function getTwitterAccounts()
+		{
+			return $this->twitter_accounts;
+		}
+
+		public function addEmail(HighriseEmail $email)
+		{
+			$this->emails[$email->id] = $email;
+
+		}
+
+		public function loadContactDataFromXMLObject($xml_obj)
+		{
+			$this->phone_numbers = array();
+			$this->email_addresses = array();
+			$this->web_addresses = array();
+			$this->addresses = array();
+			$this->instant_messengers = array();
+
+			if (isset($xml_obj->{'phone-numbers'}))
+			{
+				foreach($xml_obj->{'phone-numbers'}->{'phone-number'} as $value)
+				{
+					$number = new HighrisePhoneNumber($value->{'id'}, $value->{'number'}, $value->{'location'});
+					$this->phone_numbers[] = $number;
+				}
+			}
+
+			if (isset($xml_obj->{'email-addresses'}))
+			{
+				foreach($xml_obj->{'email-addresses'}->{'email-address'} as $value)
+				{
+					$email_address = new HighriseEmailAddress($value->{'id'}, $value->{'address'}, $value->{'location'});
+					$this->email_addresses[] = $email_address;
+				}
+			}
+
+			if (isset($xml_obj->{'instant-messengers'}))
+			{
+				foreach($xml_obj->{'instant-messengers'}->{'instant-messenger'} as $value)
+				{
+					$instant_messenger = new HighriseInstantMessenger($value->{'id'}, $value->{'protocol'}, $value->{'address'}, $value->{'location'});
+					$this->instant_messengers[] = $instant_messenger;
+				}
+			}
+
+			if (isset($xml_obj->{'web-addresses'}))
+			{
+				foreach($xml_obj->{'web-addresses'}->{'web-address'} as $value)
+				{
+					$web_address = new HighriseWebAddress($value->{'id'}, $value->{'url'}, $value->{'location'});
+					$this->web_addresses[] = $web_address;
+				}
+			}
+
+			if (isset($xml_obj->{'twitter-accounts'}))
+			{
+				foreach($xml_obj->{'twitter-accounts'}->{'twitter-account'} as $value)
+				{
+					$twitter_account = new HighriseTwitterAccount($value->{'id'}, $value->{'username'}, $value->{'location'});
+					$this->twitter_accounts[] = $twitter_account;
+				}
+			}
+
+			if (isset($xml_obj->{'addresses'}))
+			{
+				foreach($xml_obj->{'addresses'}->{'address'} as $value)
+				{
+					$address = new HighriseAddress();
+
+					$address->setId($value->id);
+					$address->setCity($value->city);
+					$address->setCountry($value->country);
+					$address->setLocation($value->location);
+					$address->setState($value->state);
+					$address->setStreet($value->street);
+					$address->setZip($value->zip);
+
+					$this->addresses[] = $address;
+				}
+			}
+		}
+
+		public function addAddress(HighriseAddress $address)
+		{
+			$this->addresses[] = $address;
+		}
+
+		public function addEmailAddress($address, $location = "Home")
+		{
+			$item = new HighriseEmailAddress();
+			$item->setAddress($address);
+			$item->setLocation($location);
+
+			$this->email_addresses[] = $item;
+		}
+
+		public function addPhoneNumber($number, $location = "Home")
+		{
+			$item = new HighrisePhoneNumber();
+			$item->setNumber($number);
+			$item->setLocation($location);
+
+			$this->phone_numbers[] = $item;
+		}
+
+		public function addWebAddress($url, $location = "Work")
+		{
+			$item = new HighriseWebAddress();
+			$item->setUrl($url);
+			$item->setLocation($location);
+
+			$this->web_addresses[] = $item;
+		}
+
+		public function addInstantMessenger($protocol, $address, $location = "Personal")
+		{
+			$item = new HighriseInstantMessenger();
+			$item->setProtocol($protocol);
+			$item->setAddress($address);
+			$item->setLocation($location);
+
+			$this->instant_messengers[] = $item;
+		}
+
+		public function addTwitterAccount($username, $location = "Personal")
+		{
+			$item = new HighriseTwitterAccount();
+			$item->setUsername($username);
+			$item->setLocation($location);
+
+			$this->twitter_accounts[] = $item;
+		}
 
 		public function setVisibleTo($visible_to)
 		{
@@ -1717,56 +1884,11 @@
 		public $company_name;
 		public $company_id;
 
-		// contact-data
-
-		public $email_addresses;
-		public $phone_numbers;
-		public $addresses;
-		public $web_addresses;
-		public $instant_messengers;
-		public $twitter_accounts;
-
 		public $tags;
 		private $original_tags;
 
 		public $notes;
 		public $emails;
-
-		public function getEmailAddresses()
-		{
-			return $this->email_addresses;
-		}
-
-		public function getPhoneNumbers()
-		{
-			return $this->phone_numbers;
-		}
-
-		public function getAddresses()
-		{
-			return $this->addresses;
-		}
-
-		public function getWebAddresses()
-		{
-			return $this->web_addresses;
-		}
-
-		public function getInstantMessengers()
-		{
-			return $this->instant_messengers;
-		}
-
-		public function getTwitterAccounts()
-		{
-			return $this->twitter_accounts;
-		}
-
-		public function addEmail(HighriseEmail $email)
-		{
-			$this->emails[$email->id] = $email;
-
-		}
 
 		public function getEmails()
 		{
@@ -2000,129 +2122,6 @@
 					$this->addTag($tag);
 				}
 			}
-		}
-
-		public function loadContactDataFromXMLObject($xml_obj)
-		{
-			$this->phone_numbers = array();
-			$this->email_addresses = array();
-			$this->web_addresses = array();
-			$this->addresses = array();
-			$this->instant_messengers = array();
-
-			if (isset($xml_obj->{'phone-numbers'}))
-			{
-				foreach($xml_obj->{'phone-numbers'}->{'phone-number'} as $value)
-				{
-					$number = new HighrisePhoneNumber($value->{'id'}, $value->{'number'}, $value->{'location'});
-					$this->phone_numbers[] = $number;
-				}
-			}
-
-			if (isset($xml_obj->{'email-addresses'}))
-			{
-				foreach($xml_obj->{'email-addresses'}->{'email-address'} as $value)
-				{
-					$email_address = new HighriseEmailAddress($value->{'id'}, $value->{'address'}, $value->{'location'});
-					$this->email_addresses[] = $email_address;
-				}
-			}
-
-			if (isset($xml_obj->{'instant-messengers'}))
-			{
-				foreach($xml_obj->{'instant-messengers'}->{'instant-messenger'} as $value)
-				{
-					$instant_messenger = new HighriseInstantMessenger($value->{'id'}, $value->{'protocol'}, $value->{'address'}, $value->{'location'});
-					$this->instant_messengers[] = $instant_messenger;
-				}
-			}
-
-			if (isset($xml_obj->{'web-addresses'}))
-			{
-				foreach($xml_obj->{'web-addresses'}->{'web-address'} as $value)
-				{
-					$web_address = new HighriseWebAddress($value->{'id'}, $value->{'url'}, $value->{'location'});
-					$this->web_addresses[] = $web_address;
-				}
-			}
-
-			if (isset($xml_obj->{'twitter-accounts'}))
-			{
-				foreach($xml_obj->{'twitter-accounts'}->{'twitter-account'} as $value)
-				{
-					$twitter_account = new HighriseTwitterAccount($value->{'id'}, $value->{'username'}, $value->{'location'});
-					$this->twitter_accounts[] = $twitter_account;
-				}
-			}
-
-			if (isset($xml_obj->{'addresses'}))
-			{
-				foreach($xml_obj->{'addresses'}->{'address'} as $value)
-				{
-					$address = new HighriseAddress();
-
-					$address->setId($value->id);
-					$address->setCity($value->city);
-					$address->setCountry($value->country);
-					$address->setLocation($value->location);
-					$address->setState($value->state);
-					$address->setStreet($value->street);
-					$address->setZip($value->zip);
-
-					$this->addresses[] = $address;
-				}
-			}
-		}
-
-		public function addAddress(HighriseAddress $address)
-		{
-			$this->addresses[] = $address;
-		}
-
-		public function addEmailAddress($address, $location = "Home")
-		{
-			$item = new HighriseEmailAddress();
-			$item->setAddress($address);
-			$item->setLocation($location);
-
-			$this->email_addresses[] = $item;
-		}
-
-		public function addPhoneNumber($number, $location = "Home")
-		{
-			$item = new HighrisePhoneNumber();
-			$item->setNumber($number);
-			$item->setLocation($location);
-
-			$this->phone_numbers[] = $item;
-		}
-
-		public function addWebAddress($url, $location = "Work")
-		{
-			$item = new HighriseWebAddress();
-			$item->setUrl($url);
-			$item->setLocation($location);
-
-			$this->web_addresses[] = $item;
-		}
-
-		public function addInstantMessenger($protocol, $address, $location = "Personal")
-		{
-			$item = new HighriseInstantMessenger();
-			$item->setProtocol($protocol);
-			$item->setAddress($address);
-			$item->setLocation($location);
-
-			$this->instant_messengers[] = $item;
-		}
-
-		public function addTwitterAccount($username, $location = "Personal")
-		{
-			$item = new HighriseTwitterAccount();
-			$item->setUsername($username);
-			$item->setLocation($location);
-
-			$this->twitter_accounts[] = $item;
 		}
 
 		public function setCompanyId($company_id)
