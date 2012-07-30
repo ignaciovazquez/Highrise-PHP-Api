@@ -1622,6 +1622,81 @@
 
 	class HighriseContact extends HighriseAPI
 	{
+		public $id;
+		public $background;
+		public $created_at;
+		public $updated_at;
+
+		// TODO: public $owner_id;
+		// TODO: public $group_id;
+		public $author_id;
+		public $visible_to;
+
+
+		public function setVisibleTo($visible_to)
+		{
+			$valid_permissions = array("Everyone", "Owner");
+			$visible_to = ucwords(strtolower($visible_to));
+			if ($visible_to != null && !in_array($visible_to, $valid_permissions))
+				throw new Exception("$visible_to is not a valid visibility permission. Available visibility permissions: " . implode(", ", $valid_permissions));
+
+		  $this->visible_to = (string)$visible_to;
+		}
+
+		public function getVisibleTo()
+		{
+		  return $this->visible_to;
+		}
+
+		public function setAuthorId($author_id)
+		{
+		  $this->author_id = (string)$author_id;
+		}
+
+		public function getAuthorId()
+		{
+		  return $this->author_id;
+		}
+
+		public function setUpdatedAt($updated_at)
+		{
+		  $this->updated_at = (string)$updated_at;
+		}
+
+		public function getUpdatedAt()
+		{
+		  return $this->updated_at;
+		}
+
+		public function setCreatedAt($created_at)
+		{
+		  $this->created_at = (string)$created_at;
+		}
+
+		public function getCreatedAt()
+		{
+		  return $this->created_at;
+		}
+
+		public function setBackground($background)
+		{
+		  $this->background = (string)$background;
+		}
+
+		public function getBackground()
+		{
+		  return $this->background;
+		}
+
+		public function setId($id)
+		{
+		  $this->id = (string)$id;
+		}
+
+		public function getId()
+		{
+		  return $this->id;
+		}
 
 		public function __construct(HighriseAPI $highrise)
 		{
@@ -1636,20 +1711,11 @@
 
 	class HighrisePerson extends HighriseContact
 	{
-		public $id;
 		public $title;
 		public $first_name;
 		public $last_name;
-		public $background;
 		public $company_name;
-		public $created_at;
-		public $updated_at;
 		public $company_id;
-
-		// TODO: public $owner_id;
-		// TODO: public $group_id;
-		public $author_id;
-		public $visible_to;
 
 		// contact-data
 
@@ -2069,51 +2135,6 @@
 		  return $this->company_id;
 		}
 
-		public function setVisibleTo($visible_to)
-		{
-			$valid_permissions = array("Everyone", "Owner");
-			$visible_to = ucwords(strtolower($visible_to));
-			if ($visible_to != null && !in_array($visible_to, $valid_permissions))
-				throw new Exception("$visible_to is not a valid visibility permission. Available visibility permissions: " . implode(", ", $valid_permissions));
-
-		  $this->visible_to = (string)$visible_to;
-		}
-
-		public function getVisibleTo()
-		{
-		  return $this->visible_to;
-		}
-
-		public function setAuthorId($author_id)
-		{
-		  $this->author_id = (string)$author_id;
-		}
-
-		public function getAuthorId()
-		{
-		  return $this->author_id;
-		}
-
-		public function setUpdatedAt($updated_at)
-		{
-		  $this->updated_at = (string)$updated_at;
-		}
-
-		public function getUpdatedAt()
-		{
-		  return $this->updated_at;
-		}
-
-		public function setCreatedAt($created_at)
-		{
-		  $this->created_at = (string)$created_at;
-		}
-
-		public function getCreatedAt()
-		{
-		  return $this->created_at;
-		}
-
 		public function setCompanyName($company_name)
 		{
 		  $this->company_name = (string)$company_name;
@@ -2123,17 +2144,6 @@
 		{
 		  return $this->company_name;
 		}
-
-		public function setBackground($background)
-		{
-		  $this->background = (string)$background;
-		}
-
-		public function getBackground()
-		{
-		  return $this->background;
-		}
-
 
 		public function getFullName()
 		{
@@ -2167,17 +2177,6 @@
 		public function getTitle()
 		{
 		  return $this->title;
-		}
-
-
-		public function setId($id)
-		{
-		  $this->id = (string)$id;
-		}
-
-		public function getId()
-		{
-		  return $this->id;
 		}
 	}
 
