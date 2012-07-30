@@ -1635,7 +1635,6 @@
 		// TODO: public $owner_id;
 		// TODO: public $group_id;
 		public $author_id;
-		public $contact_details;
 		public $visible_to;
 
 		// contact-data
