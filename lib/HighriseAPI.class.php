@@ -1876,6 +1876,21 @@
 		}
 	}
 
+	class HighriseCompany extends HighriseContact
+	{
+		public $name;
+
+		public function setTitle($title)
+		{
+		  $this->title = (string)$title;
+		}
+
+		public function getTitle()
+		{
+		  return $this->title;
+		}
+	}
+
 	class HighrisePerson extends HighriseContact
 	{
 		public $title;
