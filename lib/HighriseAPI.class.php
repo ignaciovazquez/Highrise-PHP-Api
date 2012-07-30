@@ -1620,7 +1620,21 @@
 		}
 	}
 
-	class HighrisePerson extends HighriseAPI
+	class HighriseContact extends HighriseAPI
+	{
+
+		public function __construct(HighriseAPI $highrise)
+		{
+			$this->highrise = $highrise;
+			$this->account = $highrise->account;
+			$this->token = $highrise->token;
+			$this->setVisibleTo("Everyone");
+			$this->debug = $highrise->debug;
+			$this->curl = curl_init();
+		}
+	}
+
+	class HighrisePerson extends HighriseContact
 	{
 		public $id;
 		public $title;
@@ -2164,16 +2178,6 @@
 		public function getId()
 		{
 		  return $this->id;
-		}
-
-		public function __construct(HighriseAPI $highrise)
-		{
-			$this->highrise = $highrise;
-			$this->account = $highrise->account;
-			$this->token = $highrise->token;
-			$this->setVisibleTo("Everyone");
-			$this->debug = $highrise->debug;
-			$this->curl = curl_init();
 		}
 	}
 
