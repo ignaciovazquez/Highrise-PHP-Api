@@ -1880,6 +1880,98 @@
 	{
 		public $name;
 
+		public function delete()
+		{
+			$this->postDataWithVerb("/companies/" . $this->getId() . ".xml", "", "DELETE");
+			$this->checkForErrors("Company", 200);
+		}
+
+		public function save()
+		{
+			$company_xml = $this->toXML(false);
+			if ($this->getId() != null)
+			{
+				$new_xml = $this->postDataWithVerb("/companies/" . $this->getId() . ".xml?reload=true", $company_xml, "PUT");
+				$this->checkForErrors("Company");
+			}
+			else
+			{
+				$new_xml = $this->postDataWithVerb("/companies.xml", $company_xml, "POST");
+				$this->checkForErrors("Company", 201);
+			}
+
+			// Reload object and add tags.
+			// TODO: $tags = $this->tags;
+			// TODO:$original_tags = $this->original_tags;
+
+			$this->loadFromXMLObject(simplexml_load_string($new_xml));
+			// TODO: $this->tags = $tags;
+			// TODO: $this->original_tags = $original_tags;
+			// TODO: $this->saveTags();
+
+			return true;
+		}
+
+		public function toXML()
+		{
+			$xml[] = "<company>";
+
+			$fields = array("name", "background", "visible_to");
+
+
+			if ($this->getId() != null)
+				$xml[] = '<id type="integer">' . $this->getId() . '</id>';
+
+			foreach($fields as $field)
+			{
+				$xml_field_name = str_replace("_", "-", $field);
+				$xml[] = "\t<" . $xml_field_name . ">" . $this->$field . "</" . $xml_field_name . ">";
+			}
+
+			$xml[] = "<contact-data>";
+
+			foreach(array("email_address", "instant_messenger", "twitter_account", "web_address", "address", "phone_number") as $contact_node)
+			{
+				if (!strstr($contact_node, "address"))
+					$contact_node_plural = $contact_node . "s";
+				else
+					$contact_node_plural = $contact_node . "es";
+
+
+				if (count($this->$contact_node_plural) > 0)
+				{
+					$xml[] = "<" . str_replace("_", "-", $contact_node_plural) . ">";
+					foreach($this->$contact_node_plural as $items)
+					{
+						$xml[] = $items->toXML();
+					}
+					$xml[] = "</" . str_replace("_", "-", $contact_node_plural) . ">";
+				}
+			}
+			$xml[] = "</contact-data>";
+
+			$xml[] = "</company>";
+
+			return implode("\n", $xml);
+		}
+
+		public function loadFromXMLObject($xml_obj)
+		{
+			if ($this->debug)
+				print_r($xml_obj);
+
+			$this->setId($xml_obj->id);
+			$this->setName($xml_obj->{'name'});
+			$this->setAuthorId($xml_obj->{'author-id'});
+			$this->setBackground($xml_obj->{'background'});
+			$this->setVisibleTo($xml_obj->{'visible-to'});
+			$this->setCreatedAt($xml_obj->{'created-at'});
+			$this->setUpdatedAt($xml_obj->{'updated-at'});
+
+			$this->loadContactDataFromXMLObject($xml_obj->{'contact-data'});
+			// TODO: $this->loadTagsFromXMLObject($xml_obj->{'tags'});
+		}
+
 		public function setTitle($title)
 		{
 		  $this->title = (string)$title;
