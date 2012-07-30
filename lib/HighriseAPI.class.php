@@ -1674,7 +1674,6 @@
 		public function addEmail(HighriseEmail $email)
 		{
 			$this->emails[$email->id] = $email;
-
 		}
 
 		public function loadContactDataFromXMLObject($xml_obj)
@@ -1807,62 +1806,62 @@
 			if ($visible_to != null && !in_array($visible_to, $valid_permissions))
 				throw new Exception("$visible_to is not a valid visibility permission. Available visibility permissions: " . implode(", ", $valid_permissions));
 
-		  $this->visible_to = (string)$visible_to;
+			$this->visible_to = (string)$visible_to;
 		}
 
 		public function getVisibleTo()
 		{
-		  return $this->visible_to;
+			return $this->visible_to;
 		}
 
 		public function setAuthorId($author_id)
 		{
-		  $this->author_id = (string)$author_id;
+			$this->author_id = (string)$author_id;
 		}
 
 		public function getAuthorId()
 		{
-		  return $this->author_id;
+			return $this->author_id;
 		}
 
 		public function setUpdatedAt($updated_at)
 		{
-		  $this->updated_at = (string)$updated_at;
+			$this->updated_at = (string)$updated_at;
 		}
 
 		public function getUpdatedAt()
 		{
-		  return $this->updated_at;
+			return $this->updated_at;
 		}
 
 		public function setCreatedAt($created_at)
 		{
-		  $this->created_at = (string)$created_at;
+			$this->created_at = (string)$created_at;
 		}
 
 		public function getCreatedAt()
 		{
-		  return $this->created_at;
+			return $this->created_at;
 		}
 
 		public function setBackground($background)
 		{
-		  $this->background = (string)$background;
+			$this->background = (string)$background;
 		}
 
 		public function getBackground()
 		{
-		  return $this->background;
+			return $this->background;
 		}
 
 		public function setId($id)
 		{
-		  $this->id = (string)$id;
+			$this->id = (string)$id;
 		}
 
 		public function getId()
 		{
-		  return $this->id;
+			return $this->id;
 		}
 
 		public function __construct(HighriseAPI $highrise)
@@ -1974,12 +1973,12 @@
 
 		public function setTitle($title)
 		{
-		  $this->title = (string)$title;
+			$this->title = (string)$title;
 		}
 
 		public function getTitle()
 		{
-		  return $this->title;
+			return $this->title;
 		}
 	}
 
@@ -2233,22 +2232,22 @@
 
 		public function setCompanyId($company_id)
 		{
-		  $this->company_id = (string)$company_id;
+			$this->company_id = (string)$company_id;
 		}
 
 		public function getCompanyId()
 		{
-		  return $this->company_id;
+			return $this->company_id;
 		}
 
 		public function setCompanyName($company_name)
 		{
-		  $this->company_name = (string)$company_name;
+			$this->company_name = (string)$company_name;
 		}
 
 		public function getCompanyName()
 		{
-		  return $this->company_name;
+			return $this->company_name;
 		}
 
 		public function getFullName()
@@ -2257,32 +2256,32 @@
 		}
 		public function setLastName($last_name)
 		{
-		  $this->last_name = (string)$last_name;
+			$this->last_name = (string)$last_name;
 		}
 
 		public function getLastName()
 		{
-		  return $this->last_name;
+			return $this->last_name;
 		}
 
 		public function setFirstName($first_name)
 		{
-		  $this->first_name = (string)$first_name;
+			$this->first_name = (string)$first_name;
 		}
 
 		public function getFirstName()
 		{
-		  return $this->first_name;
+			return $this->first_name;
 		}
 
 		public function setTitle($title)
 		{
-		  $this->title = (string)$title;
+			$this->title = (string)$title;
 		}
 
 		public function getTitle()
 		{
-		  return $this->title;
+			return $this->title;
 		}
 	}
 
