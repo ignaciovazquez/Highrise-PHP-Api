@@ -2046,7 +2046,7 @@
 			}
 		}
 
-		public function toXML($with_id = true)
+		public function toXML()
 		{
 			$xml[] = "<person>";
 
