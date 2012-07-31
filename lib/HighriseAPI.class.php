@@ -2090,14 +2090,14 @@
 			// TODO: $this->loadTagsFromXMLObject($xml_obj->{'tags'});
 		}
 
-		public function setTitle($title)
+		public function setName($name)
 		{
-			$this->title = (string)$title;
+			$this->name = (string)$name;
 		}
 
-		public function getTitle()
+		public function getName()
 		{
-			return $this->title;
+			return $this->name;
 		}
 	}
 
