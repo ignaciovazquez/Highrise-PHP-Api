@@ -1641,6 +1641,9 @@
 		public $instant_messengers;
 		public $twitter_accounts;
 
+		public $tags;
+		private $original_tags;
+
 		public function getEmailAddresses()
 		{
 			return $this->email_addresses;
@@ -1674,6 +1677,38 @@
 		public function addEmail(HighriseEmail $email)
 		{
 			$this->emails[$email->id] = $email;
+		}
+
+		public function addTag($v)
+		{
+			if ($v instanceof HighriseTag && !isset($this->tags[$v->getName()]))
+			{
+				$this->tags[$v->getName()] = $v;
+				$this->original_tags[$v->getId()] = 1;
+
+			}
+			elseif (!isset($this->tags[$v]))
+			{
+				$tag = new HighriseTag();
+				$tag->name = $v;
+				$this->tags[$v] = $tag;
+			}
+		}
+
+		public function loadTagsFromXMLObject($xml_obj)
+		{
+			$this->original_tags = array();
+			$this->tags = array();
+
+			if (count($xml_obj->{'tag'}) > 0)
+			{
+				foreach($xml_obj->{'tag'} as $value)
+				{
+					$tag = new HighriseTag($value->{'id'}, $value->{'name'});
+					$original_tags[$tag->getName()] = 1;
+					$this->addTag($tag);
+				}
+			}
 		}
 
 		public function loadContactDataFromXMLObject($xml_obj)
@@ -1900,15 +1935,56 @@
 			}
 
 			// Reload object and add tags.
-			// TODO: $tags = $this->tags;
-			// TODO:$original_tags = $this->original_tags;
+			$tags = $this->tags;
+			$original_tags = $this->original_tags;
 
 			$this->loadFromXMLObject(simplexml_load_string($new_xml));
-			// TODO: $this->tags = $tags;
-			// TODO: $this->original_tags = $original_tags;
-			// TODO: $this->saveTags();
+			$this->tags = $tags;
+			$this->original_tags = $original_tags;
+			$this->saveTags();
 
 			return true;
+		}
+
+		public function saveTags()
+		{
+			if (is_array($this->tags))
+			{
+				foreach($this->tags as $tag_name => $tag)
+				{
+					if ($tag->getId() == null) // New Tag
+					{
+
+						if ($this->debug)
+							print "Adding Tag: " . $tag->getName() . "\n";
+
+						$new_tag_data = $this->postDataWithVerb("/companies/" . $this->getId() . "/tags.xml", "<name>" . $tag->getName() . "</name>", "POST");
+						$this->checkForErrors("Company (add tag)", array(200, 201));
+						$new_tag_data = simplexml_load_string($new_tag_data);
+						$this->tags[$tag_name]->setId($new_tag_data->id);
+						unset($this->original_tags[$tag->getId()]);
+
+					}
+					else // Remove Tag from deletion list
+					{
+						unset($this->original_tags[$tag->getId()]);
+					}
+				}
+
+				if (is_array($this->original_tags))
+				{
+					foreach($this->original_tags as $tag_id=>$v)
+					{
+						if ($this->debug)
+							print "REMOVE TAG: " . $tag_id;
+						$new_tag_data = $this->postDataWithVerb("/companies/" . $this->getId() . "/tags/" . $tag_id . ".xml", "", "DELETE");
+						$this->checkForErrors("Person (delete tag)", 200);
+					}
+				}
+
+				foreach($this->tags as $tag_name => $tag)
+					$this->original_tags[$tag->getId()] = 1;
+			}
 		}
 
 		public function toXML()
@@ -1989,9 +2065,6 @@
 		public $last_name;
 		public $company_name;
 		public $company_id;
-
-		public $tags;
-		private $original_tags;
 
 		public $notes;
 		public $emails;
@@ -2121,22 +2194,6 @@
 			}
 		}
 
-		public function addTag($v)
-		{
-			if ($v instanceof HighriseTag && !isset($this->tags[$v->getName()]))
-			{
-				$this->tags[$v->getName()] = $v;
-				$this->original_tags[$v->getId()] = 1;
-
-			}
-			elseif (!isset($this->tags[$v]))
-			{
-				$tag = new HighriseTag();
-				$tag->name = $v;
-				$this->tags[$v] = $tag;
-			}
-		}
-
 		public function toXML()
 		{
 			$xml[] = "<person>";
@@ -2212,22 +2269,6 @@
 
 			$this->loadContactDataFromXMLObject($xml_obj->{'contact-data'});
 			$this->loadTagsFromXMLObject($xml_obj->{'tags'});
-		}
-
-		public function loadTagsFromXMLObject($xml_obj)
-		{
-			$this->original_tags = array();
-			$this->tags = array();
-
-			if (count($xml_obj->{'tag'}) > 0)
-			{
-				foreach($xml_obj->{'tag'} as $value)
-				{
-					$tag = new HighriseTag($value->{'id'}, $value->{'name'});
-					$original_tags[$tag->getName()] = 1;
-					$this->addTag($tag);
-				}
-			}
 		}
 
 		public function setCompanyId($company_id)
