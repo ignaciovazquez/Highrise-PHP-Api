@@ -1674,6 +1674,7 @@
 		// TODO: public $group_id;
 		public $author_id;
 		public $visible_to;
+		public $group_id;
 
 		// contact-data
 
@@ -1877,19 +1878,25 @@
 			$this->twitter_accounts[] = $item;
 		}
 
-		public function setVisibleTo($visible_to)
+		public function setVisibleTo($visible_to, $group_id=null)
 		{
-			$valid_permissions = array("Everyone", "Owner");
-			$visible_to = ucwords(strtolower($visible_to));
+			$valid_permissions = array("Everyone", "Owner", "NamedGroup");
+
 			if ($visible_to != null && !in_array($visible_to, $valid_permissions))
 				throw new Exception("$visible_to is not a valid visibility permission. Available visibility permissions: " . implode(", ", $valid_permissions));
 
 			$this->visible_to = (string)$visible_to;
+			$this->group_id = $visible_to == 'NamedGroup' ? (int)$group_id : null;
 		}
 
 		public function getVisibleTo()
 		{
 			return $this->visible_to;
+		}
+
+		public function getGroupId()
+		{
+			return $this->group_id;
 		}
 
 		public function setAuthorId($author_id)
@@ -2082,7 +2089,7 @@
 			$this->setName($xml_obj->{'name'});
 			$this->setAuthorId($xml_obj->{'author-id'});
 			$this->setBackground($xml_obj->{'background'});
-			$this->setVisibleTo($xml_obj->{'visible-to'});
+			$this->setVisibleTo($xml_obj->{'visible-to'}, $xml_obj->{'group-id'});
 			$this->setCreatedAt($xml_obj->{'created-at'});
 			$this->setUpdatedAt($xml_obj->{'updated-at'});
 
@@ -2304,7 +2311,7 @@
 			$this->setTitle($xml_obj->{'title'});
 			$this->setAuthorId($xml_obj->{'author-id'});
 			$this->setBackground($xml_obj->{'background'});
-			$this->setVisibleTo($xml_obj->{'visible-to'});
+			$this->setVisibleTo($xml_obj->{'visible-to'}, $xml_obj->{'group-id'});
 			$this->setCreatedAt($xml_obj->{'created-at'});
 			$this->setUpdatedAt($xml_obj->{'updated-at'});
 			$this->setCompanyId($xml_obj->{'company-id'});
