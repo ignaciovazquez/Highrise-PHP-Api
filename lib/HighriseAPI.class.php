@@ -272,6 +272,49 @@
 			return $ret;
 		}
 
+		/* Companies */
+
+		public function findAllCompanies()
+		{
+			return $this->parseCompaniesListing("/companies.xml");
+		}
+
+		public function parseCompaniesListing($url, $paging_results = 500)
+		{
+			if (strstr($url, "?"))
+				$sep = "&";
+			else
+				$sep = "?";
+
+			$offset = 0;
+			$return = array();
+			while(true) // pagination
+			{
+				$xml_url = $url . $sep . "n=$offset";
+				// print $xml_url;
+				$xml = $this->getUrl($xml_url);
+				$this->checkForErrors("Companies");
+				$xml_object = simplexml_load_string($xml);
+
+				foreach($xml_object->company as $xml_company)
+				{
+					// print_r($xml_person);
+					$company = new HighriseCompany($this);
+					$company->loadFromXMLObject($xml_company);
+					$return[] = $company;
+				}
+
+				if (count($xml_object) != $paging_results)
+					break;
+
+				$offset += $paging_results;
+			}
+
+			return $return;
+		}
+
+		/* People */
+
 		public function findAllPeople()
 		{
 			return $this->parsePeopleListing("/people.xml");
