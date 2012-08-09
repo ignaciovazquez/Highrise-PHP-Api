@@ -124,17 +124,17 @@ class HighriseAPI {
         if (!in_array($this->getLastReturnStatus(), $expected_status_codes)) {
             switch ($this->getLastReturnStatus()) {
                 case 404:
-                    throw new Exception("$type not found");
+                    throw new \Exception("$type not found");
                     break;
                 case 403:
-                    throw new Exception("Access denied to $type resource");
+                    throw new \Exception("Access denied to $type resource");
                     break;
                 case 507:
-                    throw new Exception("Cannot create $type: Insufficient storage in your Highrise Account");
+                    throw new \Exception("Cannot create $type: Insufficient storage in your Highrise Account");
                     break;
 
                 default:
-                    throw new Exception("API for $type returned Status Code: " . $this->getLastReturnStatus() . " Expected Code: " . implode(",", $expected_status_codes));
+                    throw new \Exception("API for $type returned Status Code: " . $this->getLastReturnStatus() . " Expected Code: " . implode(",", $expected_status_codes));
                     break;
             }
         }

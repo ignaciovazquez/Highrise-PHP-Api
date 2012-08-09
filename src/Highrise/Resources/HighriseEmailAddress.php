@@ -40,7 +40,7 @@ class HighriseEmailAddress {
         $valid_locations = array("Work", "Home", "Other");
         $location = ucwords(strtolower($location));
         if ($location != null && !in_array($location, $valid_locations))
-            throw new Exception("$location is not a valid location. Available locations: " . implode(", ", $valid_locations));
+            throw new \Exception("$location is not a valid location. Available locations: " . implode(", ", $valid_locations));
 
         $this->location = (string) $location;
     }

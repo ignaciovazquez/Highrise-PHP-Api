@@ -42,7 +42,7 @@ class HighriseInstantMessenger {
     public function setProtocol($protocol) {
         $valid_protocols = array("AIM", "MSN", "ICQ", "Jabber", "Yahoo", "Skype", "QQ", "Sametime", "Gadu-Gadu", "Google Talk", "Other");
         if ($protocol != null && !in_array($protocol, $valid_protocols))
-            throw new Exception("$protocol is not a valid protocol. Available protocols: " . implode(", ", $valid_protocols));
+            throw new \Exception("$protocol is not a valid protocol. Available protocols: " . implode(", ", $valid_protocols));
 
         $this->protocol = (string) $protocol;
     }
@@ -55,7 +55,7 @@ class HighriseInstantMessenger {
         $valid_locations = array("Work", "Personal", "Other");
         $location = ucwords(strtolower($location));
         if ($location != null && !in_array($location, $valid_locations))
-            throw new Exception("$location is not a valid location. Available locations: " . implode(", ", $valid_locations));
+            throw new \Exception("$location is not a valid location. Available locations: " . implode(", ", $valid_locations));
 
         $this->location = (string) $location;
     }

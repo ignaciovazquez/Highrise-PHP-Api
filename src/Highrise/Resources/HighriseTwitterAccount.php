@@ -25,7 +25,7 @@ class HighriseTwitterAccount {
     }
 
     public function setUrl($url) {
-        throw new Exception("Cannot set URLs, change Username instead");
+        throw new \Exception("Cannot set URLs, change Username instead");
     }
 
     public function getUrl() {
@@ -45,7 +45,7 @@ class HighriseTwitterAccount {
         $valid_locations = array("Business", "Personal", "Other");
         $location = ucwords(strtolower($location));
         if ($location != null && !in_array($location, $valid_locations))
-            throw new Exception("$location is not a valid location. Available locations: " . implode(", ", $valid_locations));
+            throw new \Exception("$location is not a valid location. Available locations: " . implode(", ", $valid_locations));
 
         $this->location = (string) $location;
     }

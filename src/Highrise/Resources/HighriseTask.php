@@ -36,7 +36,7 @@ class HighriseTask extends HighriseAPI {
 
     public function save() {
         if ($this->getFrame() == null)
-            throw new Exception("You need to specify a valid time frame to save a task");
+            throw new \Exception("You need to specify a valid time frame to save a task");
 
         if ($this->id == null) { // Create
             $task_xml = $this->toXML();
@@ -136,7 +136,7 @@ class HighriseTask extends HighriseAPI {
         $frame = str_replace(" ", "_", strtolower($subject_type));
 
         if ($frame != null && !in_array($frame, $valid_frames))
-            throw new Exception("$subject_type is not a valid frame. Available frames: " . implode(", ", $valid_frames));
+            throw new \Exception("$subject_type is not a valid frame. Available frames: " . implode(", ", $valid_frames));
 
         $this->frame = (string) $frame;
     }
@@ -173,7 +173,7 @@ class HighriseTask extends HighriseAPI {
         $valid_types = array("Party", "Company", "Deal", "Kase");
         $subject_type = ucwords(strtolower($subject_type));
         if ($subject_type != null && !in_array($subject_type, $valid_types))
-            throw new Exception("$subject_type is not a valid subject type. Available subject types: " . implode(", ", $valid_types));
+            throw new \Exception("$subject_type is not a valid subject type. Available subject types: " . implode(", ", $valid_types));
 
         $this->subject_type = (string) $subject_type;
     }

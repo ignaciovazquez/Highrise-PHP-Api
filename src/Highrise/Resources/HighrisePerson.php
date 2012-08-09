@@ -403,7 +403,7 @@ class HighrisePerson extends HighriseAPI {
         $valid_permissions = array("Everyone", "Owner");
         $visible_to = ucwords(strtolower($visible_to));
         if ($visible_to != null && !in_array($visible_to, $valid_permissions))
-            throw new Exception("$visible_to is not a valid visibility permission. Available visibility permissions: " . implode(", ", $valid_permissions));
+            throw new \Exception("$visible_to is not a valid visibility permission. Available visibility permissions: " . implode(", ", $valid_permissions));
 
         $this->visible_to = (string) $visible_to;
     }

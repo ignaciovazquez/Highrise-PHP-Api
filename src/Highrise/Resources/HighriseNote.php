@@ -26,7 +26,7 @@ class HighriseNote extends HighriseAPI {
 
     public function save() {
         if ($this->subject_type == null || $this->subject_id == null) {
-            throw new Exception("Subject Type and Subject ID must be set in order to create a new " . $this->_note_type);
+            throw new \Exception("Subject Type and Subject ID must be set in order to create a new " . $this->_note_type);
         }
 
         if ($this->id == null) { // Create
@@ -95,7 +95,7 @@ class HighriseNote extends HighriseAPI {
         $valid_types = array("Party", "Company", "Deal", "Kase");
         $subject_type = ucwords(strtolower($subject_type));
         if ($subject_type != null && !in_array($subject_type, $valid_types))
-            throw new Exception("$subject_type is not a valid subject type. Available subject types: " . implode(", ", $valid_types));
+            throw new \Exception("$subject_type is not a valid subject type. Available subject types: " . implode(", ", $valid_types));
 
         $this->subject_type = (string) $subject_type;
     }
