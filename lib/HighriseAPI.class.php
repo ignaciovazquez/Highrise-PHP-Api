@@ -1651,7 +1651,13 @@
 		
 		public $notes;
 		public $emails;
-		
+
+                /**
+                 *
+                 * @var array
+                 */
+                protected $customFields = array();		
+                
 		public function getEmailAddresses()
 		{
 			return $this->email_addresses;
@@ -1882,7 +1888,23 @@
 			
 			$xml[] = "</person>";
 
-			return implode("\n", $xml);		
+                        $sxe = new SimpleXMLElement(implode("\n", $xml));
+
+                        if ($this->customFields)
+                        {
+                          $subject_datas = $sxe->addChild('subject_datas');
+                          $subject_datas->addAttribute('type', 'array');
+                          foreach ($this->customFields as $subject_field_id => $value)
+                          {
+                            $data = $subject_datas->addChild('subject_data');
+                            $data->addChild('value', $value);
+                            $field_id = $data->addChild('subject_field_id', $subject_field_id);
+                            $field_id->addAttribute('type', 'integer');        
+                          }
+                        }
+
+                        return $sxe->asXML();                        
+                        		
 		}
 		
 		public function loadFromXMLObject($xml_obj)
@@ -2165,7 +2187,17 @@
 		{
 		  return $this->id;
 		}
-
+                
+                public function setCustomField($subject_field_id, $value)
+                {
+                    $this->customFields[$subject_field_id] = $value;
+                }
+                
+                public function getCustomField()
+                {
+                    return $this->customFields;
+                }
+                
 		public function __construct(HighriseAPI $highrise)
 		{
 			$this->highrise = $highrise;
@@ -2173,7 +2205,8 @@
 			$this->token = $highrise->token;
 			$this->setVisibleTo("Everyone");
 			$this->debug = $highrise->debug;
-			$this->curl = curl_init();		
+			$this->curl = curl_init();	
+                        $this->customFields = array();                        
 		}
 	}
 	
