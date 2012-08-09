@@ -3,6 +3,14 @@
 namespace Highrise\Resources;
 
 use Highrise\HighriseAPI;
+use Hihgrise\Resources\HighriseEmail;
+use Hihgrise\Resources\HighriseNote;
+use Hihgrise\Resources\HighriseTag;
+use Hihgrise\Resources\HighrisePhoneNumber;
+use Hihgrise\Resources\HighriseEmailAddress;
+use Hihgrise\Resources\HighriseInstantMessenger;
+use Hihgrise\Resources\HighriseWebAddress;
+use Hihgrise\Resources\HighriseTwitterAccount;
 
 class HighrisePerson extends HighriseAPI {
 

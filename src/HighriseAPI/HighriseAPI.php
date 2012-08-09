@@ -3,6 +3,11 @@
 namespace Highrise;
 
 use Highrise\Resources\HighrisePerson;
+use Highrise\Resources\HighriseUser;
+use Highrise\Resources\HighriseTask;
+use Highrise\Resources\HighriseEmail;
+use Highrise\Resources\HighriseNote;
+use Highrise\Resources\HighriseTag;
 
 /*
  * http://developer.37signals.com/highrise/people

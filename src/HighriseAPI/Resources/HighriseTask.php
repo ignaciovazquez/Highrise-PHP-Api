@@ -3,6 +3,7 @@
 namespace Highrise\Resources;
 
 use Highrise\HighriseAPI;
+use Highrise\Resources\HighriseUser;
 
 class HighriseTask extends HighriseAPI {
 
