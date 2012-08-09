@@ -1,5 +1,5 @@
 {
     "autoload": {
-        "psr-0": {"HighriseAPI": "src/"}
+        "psr-0": {"Highrise": "src/"}
     }
 }
