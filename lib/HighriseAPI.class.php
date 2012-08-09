@@ -139,7 +139,19 @@
 				}				
 			}
 		}
-		
+
+                public function getSubjectFields()
+                {
+                    $sxe = new SimpleXMLElement($this->getUrl("/subject_fields.xml"));
+                    $subjects_fields = array();
+                    foreach ($sxe as $subject => $values)
+                    {                   
+                      $subjects_fields[(int)$values->id] = (string)$values->label;
+                    }
+                  
+                    return $subjects_fields;
+                }
+           
 		/* Users */
 		
 		public function findAllUsers()
@@ -2193,7 +2205,7 @@
                     $this->customFields[$subject_field_id] = $value;
                 }
                 
-                public function getCustomField()
+                public function getCustomFields()
                 {
                     return $this->customFields;
                 }
