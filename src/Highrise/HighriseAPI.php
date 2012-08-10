@@ -141,7 +141,7 @@ class HighriseAPI {
     }
 
     public function getSubjectFields() {
-        $sxe = new SimpleXMLElement($this->getUrl("/subject_fields.xml"));
+        $sxe = new \SimpleXMLElement($this->getUrl("/subject_fields.xml"));
         $subjects_fields = array();
         foreach ($sxe as $subject => $values) {
             $subjects_fields[(int) $values->id] = (string) $values->label;
