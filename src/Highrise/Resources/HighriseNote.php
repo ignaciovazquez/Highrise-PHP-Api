@@ -4,22 +4,29 @@ namespace Highrise\Resources;
 
 use Highrise\HighriseAPI;
 
-class HighriseNote extends HighriseAPI {
+class HighriseNote {
 
-    protected $_note_type;
-    protected $_note_url;
-    public $id;
-    public $author_id;
-    public $body;
-    public $created_at;
-    public $owner_id;
-    public $subject_id;
-    public $subject_type;
-    public $updated_at;
-    public $visible_to;
-    public $subject_name;
-    public $deleted;
+    protected $_note_type,
+              $_note_url;
+    
+    public    $id,
+              $author_id,
+              $body,
+              $created_at,
+              $owner_id,
+              $subject_id,
+              $subject_type,
+              $updated_at,
+              $visible_to,
+              $subject_name,
+              $deleted;
 
+    /**
+     *
+     * @var HighriseAPI
+     */
+    protected $client;
+    
     // public $group_id
     // public $collection_id;
     // public $collection_type;
@@ -31,21 +38,21 @@ class HighriseNote extends HighriseAPI {
 
         if ($this->id == null) { // Create
             $note_xml = $this->toXML();
-            $new_xml = $this->postDataWithVerb($this->_note_url . ".xml", $note_xml, "POST");
-            $this->checkForErrors(ucwords($this->_note_type), 201);
+            $new_xml = $this->client->postDataWithVerb($this->_note_url . ".xml", $note_xml, "POST");
+            $this->client->checkForErrors(ucwords($this->_note_type), 201);
             $this->loadFromXMLObject(simplexml_load_string($new_xml));
             return true;
         } else { // Update
             $note_xml = $this->toXML();
-            $new_xml = $this->postDataWithVerb($this->_note_url . "/" . $this->getId() . ".xml", $note_xml, "PUT");
-            $this->checkForErrors(ucwords($this->_note_type), 200);
+            $new_xml = $this->client->postDataWithVerb($this->_note_url . "/" . $this->getId() . ".xml", $note_xml, "PUT");
+            $this->client->checkForErrors(ucwords($this->_note_type), 200);
             return true;
         }
     }
 
     public function delete() {
-        $this->postDataWithVerb($this->_note_url . "/" . $this->getId() . ".xml", "", "DELETE");
-        $this->checkForErrors(ucwords($this->_note_type), 200);
+        $this->client->postDataWithVerb($this->_note_url . "/" . $this->getId() . ".xml", "", "DELETE");
+        $this->client->checkForErrors(ucwords($this->_note_type), 200);
         $this->deleted = true;
     }
 
@@ -144,13 +151,9 @@ class HighriseNote extends HighriseAPI {
         return $this->author_id;
     }
 
-    public function __construct(HighriseAPI $highrise) {
-        $this->account = $highrise->account;
-        $this->token = $highrise->token;
+    public function __construct(HighriseAPI $client) {
+        $this->client = $client;
         $this->setVisibleTo("Everyone");
-        $this->debug = $highrise->debug;
-        $this->curl = curl_init();
-
         $this->_note_type = "note";
         $this->_note_url = "/notes";
     }

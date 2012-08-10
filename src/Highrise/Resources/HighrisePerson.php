@@ -12,34 +12,36 @@ use Highrise\Resources\HighriseInstantMessenger;
 use Highrise\Resources\HighriseWebAddress;
 use Highrise\Resources\HighriseTwitterAccount;
 
-class HighrisePerson extends HighriseAPI {
-
-    public $id;
-    public $title;
-    public $first_name;
-    public $last_name;
-    public $background;
-    public $company_name;
-    public $created_at;
-    public $updated_at;
-    public $company_id;
-    // TODO: public $owner_id;
-    // TODO: public $group_id;
-    public $author_id;
-    public $contact_details;
-    public $visible_to;
-    // contact-data
-
-    public $email_addresses;
-    public $phone_numbers;
-    public $addresses;
-    public $web_addresses;
-    public $instant_messengers;
-    public $twitter_accounts;
-    public $tags;
+class HighrisePerson {
+    public  $id,
+            $title,
+            $first_name,
+            $last_name,
+            $background,
+            $company_name,
+            $created_at,
+            $updated_at,
+            $company_id,
+            $author_id,
+            $contact_details,
+            $visible_to,
+            $email_addresses,
+            $phone_numbers,
+            $addresses,
+            $web_addresses,
+            $instant_messengers,
+            $twitter_accounts,
+            $tags,
+            $notes,
+            $emails;
+    
     private $original_tags;
-    public $notes;
-    public $emails;
+    
+    /**
+     *
+     * @var HighriseAPI
+     */
+    protected $client;
 
     /**
      *
@@ -77,7 +79,7 @@ class HighrisePerson extends HighriseAPI {
 
     public function getEmails() {
         $this->emails = array();
-        $xml = $this->getURL("/people/" . $this->id . "/emails.xml");
+        $xml = $this->client->getURL("/people/" . $this->id . "/emails.xml");
         $xml_obj = simplexml_load_string($xml);
 
         if ($this->debug == true)
@@ -86,7 +88,7 @@ class HighrisePerson extends HighriseAPI {
 
         if (isset($xml_obj->email) && count($xml_obj->email) > 0) {
             foreach ($xml_obj->email as $xml_email) {
-                $email = new HighriseEmail($this->highrise);
+                $email = new HighriseEmail($this->client);
                 $email->loadFromXMLObject($xml_email);
                 $this->addEmail($email);
             }
@@ -104,7 +106,7 @@ class HighrisePerson extends HighriseAPI {
 
     public function getNotes() {
         $this->notes = array();
-        $xml = $this->getURL("/people/" . $this->id . "/notes.xml");
+        $xml = $this->client->getURL("/people/" . $this->id . "/notes.xml");
         $xml_obj = simplexml_load_string($xml);
 
         if ($this->debug == true)
@@ -113,7 +115,7 @@ class HighrisePerson extends HighriseAPI {
 
         if (isset($xml_obj->note) && count($xml_obj->note) > 0) {
             foreach ($xml_obj->note as $xml_note) {
-                $note = new HighriseNote($this->highrise);
+                $note = new HighriseNote($this->client);
                 $note->loadFromXMLObject($xml_note);
                 $this->addNote($note);
             }
@@ -123,18 +125,18 @@ class HighrisePerson extends HighriseAPI {
     }
 
     public function delete() {
-        $this->postDataWithVerb("/people/" . $this->getId() . ".xml", "", "DELETE");
-        $this->checkForErrors("Person", 200);
+        $this->client->postDataWithVerb("/people/" . $this->getId() . ".xml", "", "DELETE");
+        $this->client->checkForErrors("Person", 200);
     }
 
     public function save() {
         $person_xml = $this->toXML(false);
         if ($this->getId() != null) {
-            $new_xml = $this->postDataWithVerb("/people/" . $this->getId() . ".xml?reload=true", $person_xml, "PUT");
-            $this->checkForErrors("Person");
+            $new_xml = $this->client->postDataWithVerb("/people/" . $this->getId() . ".xml?reload=true", $person_xml, "PUT");
+            $this->client->checkForErrors("Person");
         } else {
-            $new_xml = $this->postDataWithVerb("/people.xml", $person_xml, "POST");
-            $this->checkForErrors("Person", 201);
+            $new_xml = $this->client->postDataWithVerb("/people.xml", $person_xml, "POST");
+            $this->client->checkForErrors("Person", 201);
         }
 
         // Reload object and add tags.
@@ -156,8 +158,8 @@ class HighrisePerson extends HighriseAPI {
                     if ($this->debug)
                         print "Adding Tag: " . $tag->getName() . "\n";
 
-                    $new_tag_data = $this->postDataWithVerb("/people/" . $this->getId() . "/tags.xml", "<name>" . $tag->getName() . "</name>", "POST");
-                    $this->checkForErrors("Person (add tag)", array(200, 201));
+                    $new_tag_data = $this->client->postDataWithVerb("/people/" . $this->getId() . "/tags.xml", "<name>" . $tag->getName() . "</name>", "POST");
+                    $this->client->checkForErrors("Person (add tag)", array(200, 201));
                     $new_tag_data = simplexml_load_string($new_tag_data);
                     $this->tags[$tag_name]->setId($new_tag_data->id);
                     unset($this->original_tags[$tag->getId()]);
@@ -171,8 +173,8 @@ class HighrisePerson extends HighriseAPI {
                 foreach ($this->original_tags as $tag_id => $v) {
                     if ($this->debug)
                         print "REMOVE TAG: " . $tag_id;
-                    $new_tag_data = $this->postDataWithVerb("/people/" . $this->getId() . "/tags/" . $tag_id . ".xml", "", "DELETE");
-                    $this->checkForErrors("Person (delete tag)", 200);
+                    $new_tag_data = $this->client->postDataWithVerb("/people/" . $this->getId() . "/tags/" . $tag_id . ".xml", "", "DELETE");
+                    $this->client->checkForErrors("Person (delete tag)", 200);
                 }
             }
 
@@ -483,13 +485,9 @@ class HighrisePerson extends HighriseAPI {
         return $this->customFields;
     }
 
-    public function __construct(HighriseAPI $highrise) {
-        $this->highrise = $highrise;
-        $this->account = $highrise->account;
-        $this->token = $highrise->token;
+    public function __construct(HighriseAPI $client) {
+        $this->client = $client;
         $this->setVisibleTo("Everyone");
-        $this->debug = $highrise->debug;
-        $this->curl = curl_init();
         $this->customFields = array();
     }
 

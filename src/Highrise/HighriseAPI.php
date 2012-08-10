@@ -47,7 +47,7 @@ class HighriseAPI {
         curl_setopt($this->curl, CURLOPT_USERPWD, $this->token . ':x');
     }
 
-    protected function postDataWithVerb($path, $request_body, $verb = "POST") {
+    public function postDataWithVerb($path, $request_body, $verb = "POST") {
         $this->curl = curl_init();
 
         $url = "https://" . $this->account . ".highrisehq.com" . $path;
@@ -83,7 +83,7 @@ class HighriseAPI {
         return $ret;
     }
 
-    protected function getURL($path) {
+    public function getURL($path) {
         curl_setopt($this->curl, CURLOPT_HTTPHEADER, array('Accept: application/xml', 'Content-Type: application/xml'));
         curl_setopt($this->curl, CURLOPT_USERPWD, $this->token . ':x');
         curl_setopt($this->curl, CURLOPT_SSL_VERIFYPEER, 0);
@@ -117,7 +117,7 @@ class HighriseAPI {
         return $xml_object;
     }
 
-    protected function checkForErrors($type, $expected_status_codes = 200) {
+    public function checkForErrors($type, $expected_status_codes = 200) {
         if (!is_array($expected_status_codes))
             $expected_status_codes = array($expected_status_codes);
 

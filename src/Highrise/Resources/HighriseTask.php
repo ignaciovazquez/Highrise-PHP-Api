@@ -5,31 +5,34 @@ namespace Highrise\Resources;
 use Highrise\HighriseAPI;
 use Highrise\Resources\HighriseUser;
 
-class HighriseTask extends HighriseAPI {
-
-    private $highrise;
-    public $id;
-    public $author_id;
-    public $subject_id;
-    public $subject_type;
-    public $subject_name;
-    public $category_id;
-    public $body;
-    public $frame;
-    public $due_at;
-    public $alert_at;
-    public $created_at;
-    public $updated_at;
-    public $public;
-    public $recording_id;
-    public $notify;
-    public $owner_id;
-    public $deleted;
+class HighriseTask {
+    public  $id,
+            $author_id,
+            $subject_id,
+            $subject_type,
+            $subject_name,
+            $category_id,
+            $body,
+            $frame,
+            $due_at,
+            $alert_at,
+            $created_at,
+            $updated_at,
+            $public,
+            $recording_id,
+            $notify,
+            $owner_id,
+            $deleted;
+    
+    /**
+     *
+     * @var HighriseAPI
+     */
+    protected $client;
 
     public function complete() {
-        $task_xml = $this->toXML();
-        $new_task_xml = $this->postDataWithVerb("/tasks/" . $this->getId() . "/complete.xml", "", "POST");
-        $this->checkForErrors("Task", 200);
+        $new_task_xml = $this->client->postDataWithVerb("/tasks/" . $this->getId() . "/complete.xml", "", "POST");
+        $this->client->checkForErrors("Task", 200);
         $this->loadFromXMLObject(simplexml_load_string($new_task_xml));
         return true;
     }
@@ -40,21 +43,21 @@ class HighriseTask extends HighriseAPI {
 
         if ($this->id == null) { // Create
             $task_xml = $this->toXML();
-            $new_task_xml = $this->postDataWithVerb("/tasks.xml", $task_xml, "POST");
-            $this->checkForErrors("Task", 201);
+            $new_task_xml = $this->client->postDataWithVerb("/tasks.xml", $task_xml, "POST");
+            $this->client->checkForErrors("Task", 201);
             $this->loadFromXMLObject(simplexml_load_string($new_task_xml));
             return true;
         } else {
             $task_xml = $this->toXML();
-            $new_task_xml = $this->postDataWithVerb("/tasks/" . $this->getId() . ".xml", $task_xml, "PUT");
-            $this->checkForErrors("Task", 200);
+            $new_task_xml = $this->client->postDataWithVerb("/tasks/" . $this->getId() . ".xml", $task_xml, "PUT");
+            $this->client->checkForErrors("Task", 200);
             return true;
         }
     }
 
     public function delete() {
-        $this->postDataWithVerb("/tasks/" . $this->getId() . ".xml", "", "DELETE");
-        $this->checkForErrors("Task", 200);
+        $this->client->postDataWithVerb("/tasks/" . $this->getId() . ".xml", "", "DELETE");
+        $this->client->checkForErrors("Task", 200);
         $this->deleted = true;
     }
 
@@ -243,11 +246,8 @@ class HighriseTask extends HighriseAPI {
         return true;
     }
 
-    public function __construct(HighriseAPI $highrise) {
-        $this->account = $highrise->account;
-        $this->token = $highrise->token;
-        $this->debug = $highrise->debug;
-        $this->curl = curl_init();
+    public function __construct(HighriseAPI $client) {
+        $this->client = $client;
     }
 
 }
