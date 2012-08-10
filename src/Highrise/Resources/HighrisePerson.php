@@ -82,7 +82,7 @@ class HighrisePerson {
         $xml = $this->client->getURL("/people/" . $this->id . "/emails.xml");
         $xml_obj = simplexml_load_string($xml);
 
-        if ($this->debug == true)
+        if ($this->client->debug == true)
             ;
         print_r($xml_obj);
 
@@ -109,7 +109,7 @@ class HighrisePerson {
         $xml = $this->client->getURL("/people/" . $this->id . "/notes.xml");
         $xml_obj = simplexml_load_string($xml);
 
-        if ($this->debug == true)
+        if ($this->client->debug == true)
             ;
         print_r($xml_obj);
 
@@ -155,7 +155,7 @@ class HighrisePerson {
         if (is_array($this->tags)) {
             foreach ($this->tags as $tag_name => $tag) {
                 if ($tag->getId() == null) { // New Tag
-                    if ($this->debug)
+                    if ($this->client->debug)
                         print "Adding Tag: " . $tag->getName() . "\n";
 
                     $new_tag_data = $this->client->postDataWithVerb("/people/" . $this->getId() . "/tags.xml", "<name>" . $tag->getName() . "</name>", "POST");
@@ -171,7 +171,7 @@ class HighrisePerson {
 
             if (is_array($this->original_tags)) {
                 foreach ($this->original_tags as $tag_id => $v) {
-                    if ($this->debug)
+                    if ($this->client->debug)
                         print "REMOVE TAG: " . $tag_id;
                     $new_tag_data = $this->client->postDataWithVerb("/people/" . $this->getId() . "/tags/" . $tag_id . ".xml", "", "DELETE");
                     $this->client->checkForErrors("Person (delete tag)", 200);
@@ -230,7 +230,7 @@ class HighrisePerson {
     }
 
     public function loadFromXMLObject($xml_obj) {
-        if ($this->debug)
+        if ($this->client->debug)
             print_r($xml_obj);
 
         $this->setId($xml_obj->id);

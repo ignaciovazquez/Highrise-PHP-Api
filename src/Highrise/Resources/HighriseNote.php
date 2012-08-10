@@ -57,7 +57,7 @@ class HighriseNote {
     }
 
     public function loadFromXMLObject($xml_obj) {
-        if ($this->debug)
+        if ($this->client->debug)
             print_r($xml_obj);
 
         $this->setId($xml_obj->{'id'});
