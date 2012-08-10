@@ -238,7 +238,7 @@ class HighrisePerson extends HighriseAPI {
 
         $xml[] = "</person>";
 
-        $sxe = new SimpleXMLElement(implode("\n", $xml));
+        $sxe = new \SimpleXMLElement(implode("\n", $xml));
 
         if ($this->customFields) {
             $subject_datas = $sxe->addChild('subject_datas');
