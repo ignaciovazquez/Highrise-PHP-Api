@@ -19,6 +19,21 @@ $person = new HighrisePerson($highrise);
 $person->setFirstName("Personality");
 $person->setLastName("Changer");
 $person->addEmailAddress("personalityc@gmail.com");
+
+// Getting global subject fields
+$subject_fields = $highrise->getSubjectFields();
+
+// $key corresponds to the field key and $value to it label
+foreach ($subject_fields as $key => $value)
+{
+  // If I found the label I wanted to edit
+  if ($value == "MyCustomField")
+    {
+      // Setting the new value for the user custom field
+      $person->setCustomField($key, 'MyNewValue');
+    }
+}
+
 $person->save();
 print "Person ID is: " . $person->getId() . "\n";
 $person->addEmailAddress("personalitychanger@hotmail.com");
