@@ -12,13 +12,13 @@ class HighriseTag {
         $this->setName($name);
     }
 
-    public function toXML() {
-        $xml = "<tag>\n";
-        if ($this->getId() != null)
-            $xml .= '<id type="integer">' . $this->getId() . "</id>\n";
-        $xml .= '<name>' . $this->getName() . "</name>\n";
-        $xml .= "</tag>\n";
-        return $xml;
+    public function addXMLIntoNode($xml_node)
+    {
+        $email_adress_node = $xml_node->addChild('tag');
+        $email_adress_node->addChild('id', $this->getId())->addAttribute('type', 'integer');
+        $email_adress_node->addChild('name', $this->getName());
+
+        return $xml_node;
     }
 
     public function __toString() {

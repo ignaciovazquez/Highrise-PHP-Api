@@ -14,14 +14,14 @@ class HighriseTwitterAccount {
         $this->setLocation($location);
     }
 
-    public function toXML() {
-        $xml = "<twitter-account>\n";
-        if ($this->getId() != null)
-            $xml .= '<id type="integer">' . $this->getId() . "</id>\n";
-        $xml .= '<username>' . $this->getUsername() . "</username>\n";
-        $xml .= '<location>' . $this->getLocation() . "</location>\n";
-        $xml .= "</twitter-account>\n";
-        return $xml;
+    public function addXMLIntoNode($xml_node)
+    {
+        $email_adress_node = $xml_node->addChild('twitter-account');
+        $email_adress_node->addChild('id', $this->getId())->addAttribute('type', 'integer');
+        $email_adress_node->addChild('username', $this->getUsername());
+        $email_adress_node->addChild('location', $this->getLocation());
+
+        return $xml_node;
     }
 
     public function setUrl($url) {

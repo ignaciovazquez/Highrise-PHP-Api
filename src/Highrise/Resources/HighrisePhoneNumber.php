@@ -14,15 +14,15 @@ class HighrisePhoneNumber {
         $this->setLocation($location);
     }
 
-    public function toXML() {
-        $xml = "<phone-number>\n";
-        if ($this->getId() != null)
-            $xml .= '<id type="integer">' . $this->getId() . "</id>\n";
-        $xml .= '<number>' . $this->getNumber() . "</number>\n";
-        $xml .= '<location>' . $this->getLocation() . "</location>\n";
-        $xml .= "</phone-number>\n";
-        return $xml;
-    }
+    public function addXMLIntoNode($xml_node)
+    {
+        $email_adress_node = $xml_node->addChild('phone-number');
+        $email_adress_node->addChild('id', $this->getId())->addAttribute('type', 'integer');
+        $email_adress_node->addChild('number', $this->getNumber());
+        $email_adress_node->addChild('location', $this->getLocation());
+
+        return $xml_node;
+    }    
 
     public function setLocation($location) {
         $valid_locations = array("Work", "Mobile", "Fax", "Pager", "Home", "Skype", "Other");

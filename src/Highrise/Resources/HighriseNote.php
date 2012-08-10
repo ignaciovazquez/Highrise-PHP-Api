@@ -156,29 +156,17 @@ class HighriseNote extends HighriseAPI {
     }
 
     public function toXML() {
-        $xml = "<" . $this->_note_type . ">\n";
-        if ($this->getId() != null)
-            $xml .= '<id type="integer">' . $this->getId() . "</id>\n";
+        $sxe = new \SimpleXMLElement("<$this->_note_type></$this->_note_type>");
+        $sxe->addChild('id', $this->getId())->addAttribute('type', 'integer');
+        $sxe->addChild('author-id', $this->getAuthorId());
+        $sxe->addChild('body', $this->getBody());
+        $sxe->addChild('owner-id', $this->getOwnerId());
+        $sxe->addChild('subject-id', $this->getSubjectId());
+        $sxe->addChild('subject-type', $this->getSubjectType());
+        $sxe->addChild('visible-to', $this->getVisibleTo());
+        $sxe->addChild('title', $this->getTitle());
 
-        if ($this->author_id)
-            $xml .= '<author-id>' . $this->getAuthorId() . "</author-id>\n";
-
-        $xml .= '<body>' . $this->getBody() . "</body>\n";
-
-        if ($this->owner_id)
-            $xml .= '<owner-id>' . $this->getOwnerId() . "</owner-id>\n";
-
-        $xml .= '<subject-id>' . $this->getSubjectId() . "</subject-id>\n";
-        $xml .= '<subject-type>' . $this->getSubjectType() . "</subject-type>\n";
-        $xml .= '<visible-to>' . $this->getVisibleTo() . "</visible-to>\n";
-
-        if (isset($this->title)) // Email
-            $xml .= '<title>' . $this->getTitle() . "</title>\n";
-
-        // $xml .= '<subject-name>' . $this->getSubjectName() . "</subject-name>\n";
-
-        $xml .= "</" . $this->_note_type . ">\n";
-        return $xml;
+        return $sxe->asXML();
     }
 
     public function __toString() {

@@ -16,15 +16,15 @@ class HighriseInstantMessenger {
         $this->setLocation($location);
     }
 
-    public function toXML() {
-        $xml = "<instant-messenger>\n";
-        if ($this->getId() != null)
-            $xml .= '<id type="integer">' . $this->getId() . "</id>\n";
-        $xml .= '<protocol>' . $this->getProtocol() . "</protocol>\n";
-        $xml .= '<location>' . $this->getLocation() . "</location>\n";
-        $xml .= '<address>' . $this->getAddress() . "</address>\n";
-        $xml .= "</instant-messenger>\n";
-        return $xml;
+    public function addXMLIntoNode($xml_node)
+    {
+        $email_adress_node = $xml_node->addChild('instant-messenger');
+        $email_adress_node->addChild('id', $this->getId())->addAttribute('type', 'integer');
+        $email_adress_node->addChild('protocol', $this->getProtocol());
+        $email_adress_node->addChild('location', $this->getLocation());
+        $email_adress_node->addChild('address', $this->getAddress());
+
+        return $xml_node;
     }
 
     public function __toString() {

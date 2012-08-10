@@ -71,10 +71,7 @@ class HighriseTask extends HighriseAPI {
     }
 
     public function setNotify($notify) {
-        if ($notify == "true" || $notify == true || $notify == 1)
-            $notify = true;
-        else
-            $notify = false;
+        ($notify == "true" || $notify == true || $notify == 1) ? ($notify = true) : ($notify = false);
 
         $this->notify = (string) $notify;
     }
@@ -207,42 +204,21 @@ class HighriseTask extends HighriseAPI {
     }
 
     public function toXML() {
-        $xml = "<task>\n";
-        if ($this->getId() != null)
-            $xml .= '<id type="integer">' . $this->getId() . "</id>\n";
+        $sxe = new \SimpleXMLElement("<task></task>");
+        $sxe->addChild('id', $this->getId())->addAttribute('type', 'integer');
+        $sxe->addChild('recording-id', $this->getSubjectId());
+        $sxe->addChild('subject-id', $this->getSubjectId());
+        $sxe->addChild('subject-type', $this->getSubjectType());
+        $sxe->addChild('body', $this->getBody());
+        $sxe->addChild('frame', $this->getFrame());
+        $sxe->addChild('category-id', $this->getCategoryId());        
+        $sxe->addChild('owner-id', $this->getOwnerId());
+        $sxe->addChild('due-at', $this->getDueAt());
+        $sxe->addChild('alert-at', $this->getAlertAt());        
+        $sxe->addChild('public', ($this->getPublic() ? "true" : "false"))->addAttribute('type', 'boolean');
+        $sxe->addChild('notify', ($this->getNotify() ? "true" : "false"))->addAttribute('type', 'boolean');
 
-        if ($this->getRecordingId() != null) {
-            $xml .= '<recording-id>' . $this->getSubjectId() . "</subject-id>\n";
-        }
-
-        if ($this->getSubjectId() != null) {
-            $xml .= '<subject-id>' . $this->getSubjectId() . "</subject-id>\n";
-            $xml .= '<subject-type>' . $this->getSubjectType() . "</subject-type>\n";
-        }
-
-        $xml .= '<body>' . $this->getBody() . "</body>\n";
-        $xml .= '<frame>' . $this->getFrame() . "</frame>\n";
-
-        if ($this->getCategoryId() != null)
-            $xml .= '<category-id>' . $this->getCategoryId() . "</category-id>\n";
-
-        if ($this->getOwnerId() != null)
-            $xml .= '<owner-id>' . $this->getOwnerId() . "</owner-id>\n";
-
-        if ($this->getDueAt() != null)
-            $xml .= '<due-at>' . $this->getDueAt() . "</due-at>\n";
-        if ($this->getAlertAt() != null)
-            $xml .= '<alert-at>' . $this->getAlertAt() . "</alert-at>\n";
-
-        if ($this->getPublic() != null)
-            $xml .= '<public type="boolean">' . ($this->getPublic() ? "true" : "false") . "</public>\n";
-
-        if ($this->getNotify() != null)
-            $xml .= '<notify type="boolean">' . ($this->getNotify() ? "true" : "false") . "</notify>\n";
-
-
-        $xml .= "</task>\n";
-        return $xml;
+        return $sxe->asXML();
     }
 
     public function loadFromXMLObject($xml_obj) {

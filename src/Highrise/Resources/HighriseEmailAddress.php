@@ -14,14 +14,14 @@ class HighriseEmailAddress {
         $this->setLocation($location);
     }
 
-    public function toXML() {
-        $xml = "<email-address>\n";
-        if ($this->getId() != null)
-            $xml .= '<id type="integer">' . $this->getId() . "</id>\n";
-        $xml .= '<address>' . $this->getAddress() . "</address>\n";
-        $xml .= '<location>' . $this->getLocation() . "</location>\n";
-        $xml .= "</email-address>\n";
-        return $xml;
+    public function addXMLIntoNode($xml_node)
+    {
+        $email_adress_node = $xml_node->addChild('email-address');
+        $email_adress_node->addChild('id', $this->getId())->addAttribute('type', 'integer');
+        $email_adress_node->addChild('address', $this->getAddress());
+        $email_adress_node->addChild('location', $this->getLocation());
+
+        return $xml_node;
     }
 
     public function __toString() {

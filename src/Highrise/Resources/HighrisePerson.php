@@ -192,53 +192,26 @@ class HighrisePerson extends HighriseAPI {
         }
     }
 
-    public function toXML($with_id = true) {
-        $xml[] = "<person>";
+    public function toXML() {
+        $sxe = new \SimpleXMLElement('<person></person>');
+        $sxe->addChild('id', $this->getId())->addAttribute('type', 'integer');
 
-        // TODO: Update company_id
-        // TODO: Get Company Id
-        $fields = array("title", "first_name", "last_name", "background", "visible_to");
-
-
-        if ($this->getId() != null)
-            $xml[] = '<id type="integer">' . $this->getId() . '</id>';
-
-        $optional_fields = array("company_name");
-
+        $fields = array("title", "first_name", "last_name", "background", "visible_to", "company_name");
         foreach ($fields as $field) {
             $xml_field_name = str_replace("_", "-", $field);
-            $xml[] = "\t<" . $xml_field_name . ">" . $this->$field . "</" . $xml_field_name . ">";
+            $sxe->addChild($xml_field_name, $this->$field);
         }
 
-        foreach ($optional_fields as $field) {
-            if ($this->$field != "") {
-                $xml_field_name = str_replace("_", "-", $field);
-                $xml[] = "\t<" . $xml_field_name . ">" . $this->$field . "</" . $xml_field_name . ">";
-            }
-        }
-
-        $xml[] = "<contact-data>";
-
-        foreach (array("email_address", "instant_messenger", "twitter_account", "web_address", "address", "phone_number") as $contact_node) {
-            if (!strstr($contact_node, "address"))
-                $contact_node_plural = $contact_node . "s";
-            else
-                $contact_node_plural = $contact_node . "es";
-
-
-            if (count($this->$contact_node_plural) > 0) {
-                $xml[] = "<" . str_replace("_", "-", $contact_node_plural) . ">";
-                foreach ($this->$contact_node_plural as $items) {
-                    $xml[] = $items->toXML();
+        $contact_data_node = $sxe->addChild('contact-data');
+        $contact_data = array("email_addresses", "instant_messengers", "twitter_accounts", "web_addresses", "addresses", "phone_numbers");
+        foreach ($contact_data as $contact_node) {
+            if (count($this->$contact_node) > 0) {
+                $type_data_node = $contact_data_node->addChild(str_replace("_", "-", $contact_node));
+                foreach ($this->$contact_node as $items) {
+                    $type_data_node = $items->addXMLIntoNode($type_data_node);
                 }
-                $xml[] = "</" . str_replace("_", "-", $contact_node_plural) . ">";
             }
         }
-        $xml[] = "</contact-data>";
-
-        $xml[] = "</person>";
-
-        $sxe = new \SimpleXMLElement(implode("\n", $xml));
 
         if ($this->customFields) {
             $subject_datas = $sxe->addChild('subject_datas');
@@ -360,15 +333,18 @@ class HighrisePerson extends HighriseAPI {
 
     public function removeEmailAddress($address)
     {
-      foreach ($this->email_addresses as $email)
-      {
-        if ($email->address == $address)
+        if ($this->email_addresses)
         {
-          $email->id = '-'.$email->id;
+          foreach ($this->email_addresses as $email)
+          {
+              if ($email->address == $address)
+              {
+                  $email->id = '-'.$email->id;
+              }
+          }
         }
-      }
     }
-    
+
     public function addPhoneNumber($number, $location = "Home") {
         $item = new HighrisePhoneNumber();
         $item->setNumber($number);

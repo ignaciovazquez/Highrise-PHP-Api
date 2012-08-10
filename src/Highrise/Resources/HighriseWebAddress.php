@@ -8,14 +8,14 @@ class HighriseWebAddress {
     public $location;
     public $url;
 
-    public function toXML() {
-        $xml = "<web-address>\n";
-        if ($this->getId() != null)
-            $xml .= '<id type="integer">' . $this->getId() . "</id>\n";
-        $xml .= '<location>' . $this->getLocation() . "</location>\n";
-        $xml .= '<url>' . $this->getUrl() . "</url>\n";
-        $xml .= "</web-address>\n";
-        return $xml;
+    public function addXMLIntoNode($xml_node)
+    {
+        $email_adress_node = $xml_node->addChild('web-address');
+        $email_adress_node->addChild('id', $this->getId())->addAttribute('type', 'integer');
+        $email_adress_node->addChild('location', $this->getLocation());
+        $email_adress_node->addChild('url', $this->getUrl());
+
+        return $xml_node;
     }
 
     public function __construct($id = null, $url = null, $location = null) {

@@ -12,18 +12,18 @@ class HighriseAddress {
     public $street;
     public $zip;
 
-    public function toXML() {
-        $xml = "<address>\n";
-        if ($this->getId() != null)
-            $xml .= '<id type="integer">' . $this->getId() . "</id>\n";
-        $xml .= '<city>' . $this->getCity() . "</city>\n";
-        $xml .= '<country>' . $this->getCountry() . "</country>\n";
-        $xml .= '<location>' . $this->getLocation() . "</location>\n";
-        $xml .= '<state>' . $this->getState() . "</state>\n";
-        $xml .= '<street>' . $this->getStreet() . "</street>\n";
-        $xml .= '<zip>' . $this->getZip() . "</zip>\n";
-        $xml .= "</address>\n";
-        return $xml;
+    public function addXMLIntoNode($xml_node)
+    {
+        $email_adress_node = $xml_node->addChild('address');
+        $email_adress_node->addChild('id', $this->getId())->addAttribute('type', 'integer');
+        $email_adress_node->addChild('city', $this->getCity());
+        $email_adress_node->addChild('country', $this->getCountry());
+        $email_adress_node->addChild('location', $this->getLocation());        
+        $email_adress_node->addChild('state', $this->getState());
+        $email_adress_node->addChild('street', $this->getStreet());
+        $email_adress_node->addChild('zip', $this->getZip());
+
+        return $xml_node;
     }
 
     public function __toString() {
