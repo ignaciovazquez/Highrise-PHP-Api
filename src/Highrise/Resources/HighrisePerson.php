@@ -358,6 +358,17 @@ class HighrisePerson extends HighriseAPI {
         $this->email_addresses[] = $item;
     }
 
+    public function removeEmailAddress($address)
+    {
+      foreach ($this->email_addresses as $email)
+      {
+        if ($email->address == $address)
+        {
+          $email->id = '-'.$email->id;
+        }
+      }
+    }
+    
     public function addPhoneNumber($number, $location = "Home") {
         $item = new HighrisePhoneNumber();
         $item->setNumber($number);
