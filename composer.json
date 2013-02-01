@@ -1,5 +1,11 @@
 {
+    "name": "libcast/highrise",
+    "description": "Highrise API client",
+    "license": "BSD-4-Clause",
+    "version": "1.0.0",
     "autoload": {
-        "psr-0": {"Highrise": "src/"}
+        "psr-0": {
+            "Highrise": "src/"
+        }
     }
 }
