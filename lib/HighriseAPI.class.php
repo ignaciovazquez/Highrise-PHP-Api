@@ -1787,7 +1787,9 @@
 				{
 					$note = new HighriseNote($this->highrise);
 					$note->loadFromXMLObject($xml_note);
-					$this->addNote($note);		
+					$note->setSubjectId($this->id);
+					$note->setSubjectType("Party");
+					$this->notes[$note->id] = $note;
 				}
 			}
 			
