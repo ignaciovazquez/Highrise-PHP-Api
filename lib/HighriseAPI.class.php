@@ -53,7 +53,7 @@
 			
 			curl_setopt($this->curl, CURLOPT_URL,$url);
 			curl_setopt($this->curl, CURLOPT_POSTFIELDS, $request_body);
-			if ($this->debug == true)
+			if ($this->debug)
 				curl_setopt($this->curl, CURLOPT_VERBOSE, true);
 				
 			curl_setopt($this->curl, CURLOPT_HTTPHEADER, array('Accept: application/xml', 'Content-Type: application/xml'));
@@ -70,7 +70,7 @@
 				
 			$ret = curl_exec($this->curl);
 			
-			if ($this->debug == true)
+			if ($this->debug)
 				print "Begin Request Body ============================\n" . $request_body . "End Request Body ==============================\n";
 			
 			curl_setopt($this->curl,CURLOPT_HTTPGET, true);
@@ -88,14 +88,14 @@
 
 			$url = "https://" . $this->account . ".highrisehq.com" . $path;
 	
-			if ($this->debug == true)
+			if ($this->debug)
 				curl_setopt($this->curl, CURLOPT_VERBOSE, true);
 	
 				
 			curl_setopt($this->curl,CURLOPT_URL,$url);
 			$response = curl_exec($this->curl);
 
-			if ($this->debug == true)
+			if ($this->debug)
 				print "Response: =============\n" . $response . "============\n";
 		
 			return $response;
@@ -1748,7 +1748,7 @@
 			$xml = $this->getURL("/people/" . $this->id . "/emails.xml");
 			$xml_obj = simplexml_load_string($xml);
 
-			if ($this->debug == true);
+			if ($this->debug);
 				print_r($xml_obj);
 			
 			if (isset($xml_obj->email) && count($xml_obj->email) > 0)
@@ -1778,7 +1778,7 @@
 			$xml = $this->getURL("/people/" . $this->id . "/notes.xml");
 			$xml_obj = simplexml_load_string($xml);
 
-			if ($this->debug == true);
+			if ($this->debug);
 				print_r($xml_obj);
 			
 			if (isset($xml_obj->note) && count($xml_obj->note) > 0)
@@ -2300,7 +2300,7 @@
 			$xml = $this->getURL("/companies/" . $this->id . "/emails.xml");
 			$xml_obj = simplexml_load_string($xml);
 
-			if ($this->debug == true);
+			if ($this->debug);
 				print_r($xml_obj);
 			
 			if (isset($xml_obj->email) && count($xml_obj->email) > 0)
@@ -2330,7 +2330,7 @@
 			$xml = $this->getURL("/companies/" . $this->id . "/notes.xml");
 			$xml_obj = simplexml_load_string($xml);
 
-			if ($this->debug == true);
+			if ($this->debug);
 				print_r($xml_obj);
 			
 			if (isset($xml_obj->note) && count($xml_obj->note) > 0)
