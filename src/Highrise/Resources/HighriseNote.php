@@ -167,7 +167,9 @@ class HighriseNote {
         $sxe->addChild('subject-id', $this->getSubjectId());
         $sxe->addChild('subject-type', $this->getSubjectType());
         $sxe->addChild('visible-to', $this->getVisibleTo());
-        $sxe->addChild('title', $this->getTitle());
+        if (isset($this->title)) {
+            $sxe->addChild('title', $this->getTitle());
+        }
 
         return $sxe->asXML();
     }
