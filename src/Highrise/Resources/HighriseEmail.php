@@ -2,6 +2,8 @@
 
 namespace Highrise\Resources;
 
+use Highrise\HighriseAPI;
+
 class HighriseEmail extends HighriseNote {
 
     public $title;
@@ -21,9 +23,6 @@ class HighriseEmail extends HighriseNote {
     }
 
     public function loadFromXMLObject($xml_obj) {
-        if ($this->debug)
-            print_r($xml_obj);
-
         $this->setId($xml_obj->{'id'});
         $this->setAuthorId($xml_obj->{'author-id'});
         $this->setOwnerId($xml_obj->{'owner-id'});
