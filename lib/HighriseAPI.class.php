@@ -1860,7 +1860,7 @@
 			
 			$xml[] = "<contact-data>";
 			
-			foreach(array("email_address", "instant_messenger", "twitter_account", "web_address", "address", "phone_number") as $contact_node)
+			foreach( array("email_address", "instant_messenger", "twitter_account", "web_address", "address", "phone_number") as $contact_node)
 			{
 				if (!strstr($contact_node, "address"))
 					$contact_node_plural = $contact_node . "s";		
@@ -1878,6 +1878,14 @@
 					$xml[] = "</" . str_replace("_", "-", $contact_node_plural) . ">";
 				}
 			}
+
+			/* Add custom fields support */
+			if( isset( $this->custom_fields ) && is_array( $this->custom_fields ) ) {
+				foreach( $this->custom_fields as $cf => $value ) {
+					$xml[] = '<' . str_replace( '_', '-', $cf ) . '>' . $value . '</' . str_replace( '_', '-', $cf ) . '>';
+				}
+			}
+
 			$xml[] = "</contact-data>";
 			
 			$xml[] = "</person>";
@@ -2138,6 +2146,10 @@
 		public function setFirstName($first_name)
 		{
 		  $this->first_name = (string)$first_name;
+		}
+
+		public function setCustomField( $custom_field, $value ) {
+			$this->custom_fields[$custom_field] = $value;
 		}
 
 		public function getFirstName()
