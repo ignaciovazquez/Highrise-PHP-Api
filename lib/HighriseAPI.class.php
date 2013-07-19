@@ -287,7 +287,7 @@
 			}
 			
 			if (!isset($tag_id))
-				throw new Excepcion("Tag $tag_name not found");
+				throw new Exception("Tag $tag_name not found");
 			
 			return $this->findPeopleByTagId($tag_id);
 		}
