@@ -49,6 +49,12 @@ class HighrisePerson {
      */
     protected $customFields = array();
 
+    public function __construct(HighriseAPI $client) {
+        $this->client = $client;
+        $this->setVisibleTo("Everyone");
+        $this->customFields = array();
+    }
+
     public function getEmailAddresses() {
         return $this->email_addresses;
     }
@@ -194,6 +200,27 @@ class HighrisePerson {
         }
     }
 
+    /**
+     * 
+     * @param string $tag You can either pass a tag name or a Tag instance
+     */
+    public function removeTag($tag) {
+        if ($tag instanceof HighriseTag) {
+            $name = $tag->getName();
+        } else {
+            foreach ($this->tags as $name => $obj) {
+                if ($tag == $name) {
+                    break;
+                }
+            }
+
+            // Tag not found
+            return;
+        }
+
+        unset($this->tags[$name]);
+    }
+
     public function toXML() {
         $sxe = new \SimpleXMLElement('<person></person>');
         $sxe->addChild('id', $this->getId())->addAttribute('type', 'integer');
@@ -256,7 +283,6 @@ class HighrisePerson {
         if (count($xml_obj->{'tag'}) > 0) {
             foreach ($xml_obj->{'tag'} as $value) {
                 $tag = new HighriseTag($value->{'id'}, $value->{'name'});
-                $original_tags[$tag->getName()] = 1;
                 $this->addTag($tag);
             }
         }
@@ -345,6 +371,27 @@ class HighrisePerson {
               }
           }
         }
+    }
+
+    /**
+     * Check if the person already has a given email address
+     * 
+     * @param string $address
+     * @return boolean
+     */
+    public function hasEmailAddress($address)
+    {
+        if (!$this->email_addresses) {
+            return false;
+        }
+
+        foreach ($this->email_addresses as $email) {
+            if ($email->address == $address) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function addPhoneNumber($number, $location = "Home") {
@@ -485,10 +532,16 @@ class HighrisePerson {
         return $this->customFields;
     }
 
-    public function __construct(HighriseAPI $client) {
-        $this->client = $client;
-        $this->setVisibleTo("Everyone");
-        $this->customFields = array();
-    }
+    /**
+     * 
+     * @return \Highrise\Resources\HighriseCompany
+     */
+    public function getCompany()
+    {
+        if (!$this->company_id) {
+            return;
+        }
 
+        return $this->client->findCompanyById($this->company_id);
+    }
 }
