@@ -209,8 +209,8 @@ class HighriseTask {
     public function toXML() {
         $sxe = new \SimpleXMLElement("<task></task>");
         $sxe->addChild('id', $this->getId())->addAttribute('type', 'integer');
-        $sxe->addChild('recording-id', $this->getSubjectId());
-        $sxe->addChild('subject-id', $this->getSubjectId());
+        $sxe->addChild('recording-id', $this->getRecordingId());
+        $sxe->addChild('subject-id', $this->getSubjectId())->addAttribute('type', 'integer');
         $sxe->addChild('subject-type', $this->getSubjectType());
         $sxe->addChild('body', $this->getBody());
         $sxe->addChild('frame', $this->getFrame());
