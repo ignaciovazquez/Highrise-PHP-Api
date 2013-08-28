@@ -494,9 +494,9 @@ class HighriseAPI {
     }
 
     public function findCompaniesByName($name) {
-        $url = "/companies.xml?term=" . urlencode($name);
+        $url = "/companies/search.xml?criteria[name]=" . urlencode($name);
 
-        $companies = $this->parseCompaniesListing($name);
+        $companies = $this->parseCompaniesListing($url);
 
         return $companies;
     }
@@ -511,14 +511,12 @@ class HighriseAPI {
         $return = array();
         while (true) { // pagination
             $xml_url = $url . $sep . "n=$offset";
-            // print $xml_url;
             $xml = $this->getUrl($xml_url);
             $this->checkForErrors("Company");
             $xml_object = simplexml_load_string($xml);
-
-            foreach ($xml_object->person as $xml_person) {
+            foreach ($xml_object->company as $xml_company) {
                 $company = new HighriseCompany($this);
-                $company->loadFromXMLObject($xml_person);
+                $company->loadFromXMLObject($xml_company);
                 $return[] = $company;
             }
 
