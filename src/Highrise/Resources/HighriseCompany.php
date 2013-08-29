@@ -33,6 +33,8 @@ class HighriseCompany
             $tags,
             $notes;
 
+    private $original_tags;
+
     /**
      *
      * @var HighriseAPI
@@ -46,7 +48,7 @@ class HighriseCompany
     protected $customFields = array();
 
     /**
-     * 
+     *
      * @param HighriseAPI $client
      */
     public function __construct(HighriseAPI $client)
@@ -216,7 +218,7 @@ class HighriseCompany
     }
 
     /**
-     * 
+     *
      * @param string $tag You can either pass a tag name or a Tag instance
      */
     public function removeTag($tag)
@@ -242,7 +244,7 @@ class HighriseCompany
         $sxe = new \SimpleXMLElement('<company></company>');
         $sxe->addChild('id', $this->getId())->addAttribute('type', 'integer');
 
-        $fields = array("name", "background", "visible_to");
+        $fields = array("name", "background", "visible_to", "owner_id", "group_id");
         foreach ($fields as $field) {
             $xml_field_name = str_replace("_", "-", $field);
             $sxe->addChild($xml_field_name, $this->$field);
@@ -279,7 +281,7 @@ class HighriseCompany
             print_r($xml_obj);
 
         $this->setId($xml_obj->id);
-        $this->setName($xml_obj->{'first-name'});
+        $this->setName($xml_obj->{'name'});
         $this->setBackground($xml_obj->{'background'});
         $this->setOwnerId($xml_obj->{'owner-id'});
         $this->setGroupId($xml_obj->{'group-id'});
