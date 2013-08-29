@@ -21,8 +21,8 @@ use Highrise\Resources\HighriseTag;
  * Convenience methods for saving Notes $person->saveNotes() to check if notes were modified, etc.
  * Add Tags to Person
  */
-
-class HighriseAPI {
+class HighriseAPI
+{
     // <editor-fold desc="HTTP phrases" defaultstate="collapsed">
     /**
      * Associative array of HTTP status code / reason phrase.
@@ -31,11 +31,9 @@ class HighriseAPI {
      * @link http://tools.ietf.org/html/rfc2616#section-10
      */
     protected $phrases = array(
-
         // 1xx: Informational - Request received, continuing process
         100 => 'Continue',
         101 => 'Switching Protocols',
-
         // 2xx: Success - The action was successfully received, understood and
         // accepted
         200 => 'OK',
@@ -45,17 +43,15 @@ class HighriseAPI {
         204 => 'No Content',
         205 => 'Reset Content',
         206 => 'Partial Content',
-
         // 3xx: Redirection - Further action must be taken in order to complete
         // the request
         300 => 'Multiple Choices',
         301 => 'Moved Permanently',
-        302 => 'Found',  // 1.1
+        302 => 'Found', // 1.1
         303 => 'See Other',
         304 => 'Not Modified',
         305 => 'Use Proxy',
         307 => 'Temporary Redirect',
-
         // 4xx: Client Error - The request contains bad syntax or cannot be
         // fulfilled
         400 => 'Bad Request',
@@ -76,7 +72,6 @@ class HighriseAPI {
         415 => 'Unsupported Media Type',
         416 => 'Requested Range Not Satisfiable',
         417 => 'Expectation Failed',
-
         // 5xx: Server Error - The server failed to fulfill an apparently
         // valid request
         500 => 'Internal Server Error',
@@ -94,7 +89,8 @@ class HighriseAPI {
     protected $curl;
     public $debug;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->curl = curl_init();
         curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, true);
 
@@ -104,23 +100,26 @@ class HighriseAPI {
         curl_setopt($this->curl, CURLOPT_SSL_VERIFYHOST, 0);
     }
 
-    public function setAccount($account) {
+    public function setAccount($account)
+    {
         $this->account = $account;
     }
 
-    public function setToken($token) {
+    public function setToken($token)
+    {
         $this->token = $token;
         curl_setopt($this->curl, CURLOPT_USERPWD, $this->token . ':x');
     }
 
-    public function postDataWithVerb($path, $request_body, $verb = "POST") {
+    public function postDataWithVerb($path, $request_body, $verb = "POST")
+    {
         $this->curl = curl_init();
 
         $url = "https://" . $this->account . ".highrisehq.com" . $path;
 
-        if ($this->debug)
+        if ($this->debug) {
             print "postDataWithVerb $verb $url ============================\n";
-
+        }
 
         curl_setopt($this->curl, CURLOPT_URL, $url);
         curl_setopt($this->curl, CURLOPT_POSTFIELDS, $request_body);
@@ -132,11 +131,11 @@ class HighriseAPI {
         curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($this->curl, CURLOPT_HEADER, true);
 
-
-        if ($verb != "POST")
+        if ($verb != "POST") {
             curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, $verb);
-        else
+        } else {
             curl_setopt($this->curl, CURLOPT_POST, true);
+        }
 
         $ret = curl_exec($this->curl);
 
@@ -146,15 +145,17 @@ class HighriseAPI {
         // Return only the body
         $ret = substr($ret, curl_getinfo($this->curl, CURLINFO_HEADER_SIZE));
 
-        if ($this->debug == true)
+        if ($this->debug == true) {
             print "Begin Request Body ============================\n" . $request_body . "End Request Body ==============================\n";
+        }
 
         curl_setopt($this->curl, CURLOPT_HTTPGET, true);
 
         return $ret;
     }
 
-    public function getURL($path) {
+    public function getURL($path)
+    {
         $this->curl = curl_init();
 
         curl_setopt($this->curl, CURLOPT_HTTPHEADER, array('Accept: application/xml', 'Content-Type: application/xml'));
@@ -179,17 +180,17 @@ class HighriseAPI {
             print "Response: =============\n" . $response . "============\n";
         }
 
-
         return $response;
     }
 
-    protected function getLastReturnStatus() {
+    protected function getLastReturnStatus()
+    {
         return curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
     }
 
     /**
      *
-     * @param string $statusLine
+     * @param  string          $statusLine
      * @return array
      * @throws ServerException
      */
@@ -207,13 +208,16 @@ class HighriseAPI {
         return !empty($m[3]) ? trim($m[3]) : (isset($this->phrases[$code]) ? $this->phrases[$code] : null);
     }
 
-    protected function getXMLObjectForUrl($url) {
+    protected function getXMLObjectForUrl($url)
+    {
         $xml = $this->getURL($url);
         $xml_object = simplexml_load_string($xml);
+
         return $xml_object;
     }
 
-    public function checkForErrors($type, $expected_status_codes = 200) {
+    public function checkForErrors($type, $expected_status_codes = 200)
+    {
         if (!is_array($expected_status_codes))
             $expected_status_codes = array($expected_status_codes);
 
@@ -230,13 +234,13 @@ class HighriseAPI {
                     break;
 
                 default:
-                    throw new \Exception($this->getLastReturnStatus().' '.$this->getLastReasonPhrase().': '.implode(', ', $this->getErrors()));
+                    throw new \Exception($this->getLastReturnStatus() . ' ' . $this->getLastReasonPhrase() . ': ' . implode(', ', $this->getErrors()));
             }
         }
     }
 
     /**
-     * 
+     *
      * @return array of error messages
      */
     protected function getErrors()
@@ -245,18 +249,21 @@ class HighriseAPI {
         $body = substr($this->lastResponse, curl_getinfo($this->curl, CURLINFO_HEADER_SIZE));
         $prev = libxml_use_internal_errors(true);
         try {
-            $xml =  new \SimpleXMLElement($body);
+            $xml = new \SimpleXMLElement($body);
             foreach ($xml as $error) {
                 $errors[] = (string) $error;
             }
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
+
         libxml_clear_errors();
         libxml_use_internal_errors($prev);
 
         return $errors;
     }
 
-    public function getSubjectFields() {
+    public function getSubjectFields()
+    {
         $sxe = new \SimpleXMLElement($this->getUrl("/subject_fields.xml"));
         $subjects_fields = array();
         foreach ($sxe as $subject => $values) {
@@ -267,8 +274,8 @@ class HighriseAPI {
     }
 
     /* Users */
-
-    public function findAllUsers() {
+    public function findAllUsers()
+    {
         $xml = $this->getUrl("/users.xml");
         $this->checkForErrors("User");
 
@@ -284,37 +291,45 @@ class HighriseAPI {
         return $ret;
     }
 
-    public function findMe() {
+    public function findMe()
+    {
         $xml = $this->getUrl("/me.xml");
         $this->checkForErrors("User");
 
         $xml_obj = simplexml_load_string($xml);
         $user = new HighriseUser();
         $user->loadFromXMLObject($xml_obj);
+
         return $user;
     }
 
     /* Tasks */
-
-    public function findCompletedTasks() {
+    public function findCompletedTasks()
+    {
         $xml = $this->getUrl("/tasks/completed.xml");
         $this->checkForErrors("Tasks");
+
         return $this->parseTasks($xml);
     }
 
-    public function findAssignedTasks() {
+    public function findAssignedTasks()
+    {
         $xml = $this->getUrl("/tasks/assigned.xml");
         $this->checkForErrors("Tasks");
+
         return $this->parseTasks($xml);
     }
 
-    public function findUpcomingTasks() {
+    public function findUpcomingTasks()
+    {
         $xml = $this->getUrl("/tasks/upcoming.xml");
         $this->checkForErrors("Tasks");
+
         return $this->parseTasks($xml);
     }
 
-    private function parseTasks($xml) {
+    private function parseTasks($xml)
+    {
         $xml_object = simplexml_load_string($xml);
         $ret = array();
         foreach ($xml_object->task as $xml_task) {
@@ -326,49 +341,56 @@ class HighriseAPI {
         return $ret;
     }
 
-    public function findTaskById($id) {
+    public function findTaskById($id)
+    {
         $xml = $this->getURL("/tasks/$id.xml");
         $this->checkForErrors("Task");
         $task_xml = simplexml_load_string($xml);
         $task = new HighriseTask($this);
         $task->loadFromXMLObject($task_xml);
+
         return $task;
     }
 
     /* Notes & Emails */
-
-    public function findEmailById($id) {
+    public function findEmailById($id)
+    {
         $xml = $this->getURL("/emails/$id.xml");
         $this->checkForErrors("Email");
         $email_xml = simplexml_load_string($xml);
         $email = new HighriseEmail($this);
         $email->loadFromXMLObject($email_xml);
+
         return $email;
     }
 
-    public function findNoteById($id) {
+    public function findNoteById($id)
+    {
         $xml = $this->getURL("/notes/$id.xml");
         $this->checkForErrors("Note");
         $note_xml = simplexml_load_string($xml);
         $note = new HighriseNote($this);
         $note->loadFromXMLObject($note_xml);
+
         return $note;
     }
 
-    public function findPersonById($id) {
+    public function findPersonById($id)
+    {
         $xml = $this->getURL("/people/$id.xml");
 
         $this->checkForErrors("Person");
-
 
         $xml_object = simplexml_load_string($xml);
 
         $person = new HighrisePerson($this);
         $person->loadFromXMLObject($xml_object);
+
         return $person;
     }
 
-    public function findAllTags() {
+    public function findAllTags()
+    {
         $xml = $this->getUrl("/tags.xml");
         $this->checkForErrors("Tags");
 
@@ -381,11 +403,13 @@ class HighriseAPI {
         return $ret;
     }
 
-    public function findAllPeople() {
+    public function findAllPeople()
+    {
         return $this->parsePeopleListing("/people.xml");
     }
 
-    public function findPeopleByTagName($tag_name) {
+    public function findPeopleByTagName($tag_name)
+    {
         $tags = $this->findAllTags();
         foreach ($tags as $tag) {
             if ($tag->name == $tag_name)
@@ -398,36 +422,46 @@ class HighriseAPI {
         return $this->findPeopleByTagId($tag_id);
     }
 
-    public function findPeopleByTagId($tag_id) {
+    public function findPeopleByTagId($tag_id)
+    {
         $url = "/people.xml?tag_id=" . $tag_id;
         $people = $this->parsePeopleListing($url);
+
         return $people;
     }
 
-    public function findPeopleByEmail($email) {
+    public function findPeopleByEmail($email)
+    {
         return $this->findPeopleBySearchCriteria(array("email" => $email));
     }
 
-    public function findPeopleByTitle($title) {
+    public function findPeopleByTitle($title)
+    {
         $url = "/people.xml?title=" . urlencode($title);
 
         $people = $this->parsePeopleListing($url);
+
         return $people;
     }
 
-    public function findPeopleByCompanyId($company_id) {
+    public function findPeopleByCompanyId($company_id)
+    {
         $url = "/companies/" . urlencode($company_id) . "/people.xml";
         $people = $this->parsePeopleListing($url);
+
         return $people;
     }
 
-    public function findPeopleBySearchTerm($search_term) {
+    public function findPeopleBySearchTerm($search_term)
+    {
         $url = "/people/search.xml?term=" . urlencode($search_term);
         $people = $this->parsePeopleListing($url, 25);
+
         return $people;
     }
 
-    public function findPeopleBySearchCriteria($search_criteria) {
+    public function findPeopleBySearchCriteria($search_criteria)
+    {
         $url = "/people/search.xml";
 
         $sep = "?";
@@ -437,16 +471,20 @@ class HighriseAPI {
         }
 
         $people = $this->parsePeopleListing($url, 25);
+
         return $people;
     }
 
-    public function findPeopleSinceTime($time) {
+    public function findPeopleSinceTime($time)
+    {
         $url = "/people/search.xml?since=" . urlencode($time);
         $people = $this->parsePeopleListing($url);
+
         return $people;
     }
 
-    public function parsePeopleListing($url, $paging_results = 500) {
+    public function parsePeopleListing($url, $paging_results = 500)
+    {
         if (strstr($url, "?"))
             $sep = "&";
         else
@@ -468,8 +506,9 @@ class HighriseAPI {
                 $return[] = $person;
             }
 
-            if (count($xml_object) != $paging_results)
+            if (count($xml_object) != $paging_results) {
                 break;
+            }
 
             $offset += $paging_results;
         }
@@ -479,11 +518,11 @@ class HighriseAPI {
 
     // Companies
 
-    public function findCompanyById($id) {
+    public function findCompanyById($id)
+    {
         $xml = $this->getURL("/companies/$id.xml");
 
         $this->checkForErrors("Company");
-
 
         $xml_object = simplexml_load_string($xml);
 
@@ -493,7 +532,8 @@ class HighriseAPI {
         return $company;
     }
 
-    public function findCompaniesByName($name) {
+    public function findCompaniesByName($name)
+    {
         $url = "/companies/search.xml?criteria[name]=" . urlencode($name);
 
         $companies = $this->parseCompaniesListing($url);
@@ -501,11 +541,13 @@ class HighriseAPI {
         return $companies;
     }
 
-    public function parseCompaniesListing($url, $paging_results = 500) {
-        if (strstr($url, "?"))
+    public function parseCompaniesListing($url, $paging_results = 500)
+    {
+        if (strstr($url, "?")) {
             $sep = "&";
-        else
+        } else {
             $sep = "?";
+        }
 
         $offset = 0;
         $return = array();

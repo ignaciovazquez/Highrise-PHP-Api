@@ -12,31 +12,32 @@ use Highrise\Resources\HighriseInstantMessenger;
 use Highrise\Resources\HighriseWebAddress;
 use Highrise\Resources\HighriseTwitterAccount;
 
-class HighrisePerson {
-    public  $id,
-            $title,
-            $first_name,
-            $last_name,
-            $background,
-            $company_name,
-            $created_at,
-            $updated_at,
-            $company_id,
-            $author_id,
-            $contact_details,
-            $visible_to,
-            $email_addresses,
-            $phone_numbers,
-            $addresses,
-            $web_addresses,
-            $instant_messengers,
-            $twitter_accounts,
-            $tags,
-            $notes,
-            $emails;
-    
+class HighrisePerson
+{
+    public $id;
+    public $title;
+    public $first_name;
+    public $last_name;
+    public $background;
+    public $company_name;
+    public $created_at;
+    public $updated_at;
+    public $company_id;
+    public $author_id;
+    public $contact_details;
+    public $visible_to;
+    public $email_addresses;
+    public $phone_numbers;
+    public $addresses;
+    public $web_addresses;
+    public $instant_messengers;
+    public $twitter_accounts;
+    public $tags;
+    public $notes;
+    public $emails;
+
     private $original_tags;
-    
+
     /**
      *
      * @var HighriseAPI
@@ -49,48 +50,57 @@ class HighrisePerson {
      */
     protected $customFields = array();
 
-    public function __construct(HighriseAPI $client) {
+    public function __construct(HighriseAPI $client)
+    {
         $this->client = $client;
         $this->setVisibleTo("Everyone");
         $this->customFields = array();
     }
 
-    public function getEmailAddresses() {
+    public function getEmailAddresses()
+    {
         return $this->email_addresses;
     }
 
-    public function getPhoneNumbers() {
+    public function getPhoneNumbers()
+    {
         return $this->phone_numbers;
     }
 
-    public function getAddresses() {
+    public function getAddresses()
+    {
         return $this->addresses;
     }
 
-    public function getWebAddresses() {
+    public function getWebAddresses()
+    {
         return $this->web_addresses;
     }
 
-    public function getInstantMessengers() {
+    public function getInstantMessengers()
+    {
         return $this->instant_messengers;
     }
 
-    public function getTwitterAccounts() {
+    public function getTwitterAccounts()
+    {
         return $this->twitter_accounts;
     }
 
-    public function addEmail(HighriseEmail $email) {
+    public function addEmail(HighriseEmail $email)
+    {
         $this->emails[$email->id] = $email;
     }
 
-    public function getEmails() {
+    public function getEmails()
+    {
         $this->emails = array();
         $xml = $this->client->getURL("/people/" . $this->id . "/emails.xml");
         $xml_obj = simplexml_load_string($xml);
 
-        if ($this->client->debug == true)
-            ;
-        print_r($xml_obj);
+        if ($this->client->debug == true) {
+            print_r($xml_obj);
+        }
 
         if (isset($xml_obj->email) && count($xml_obj->email) > 0) {
             foreach ($xml_obj->email as $xml_email) {
@@ -103,21 +113,23 @@ class HighrisePerson {
         return $this->emails;
     }
 
-    public function addNote(HighriseNote $note) {
+    public function addNote(HighriseNote $note)
+    {
         $note->setSubjectId($this->id);
         $note->setSubjectType("Party");
         $note->save();
         $this->notes[$note->id] = $note;
     }
 
-    public function getNotes() {
+    public function getNotes()
+    {
         $this->notes = array();
         $xml = $this->client->getURL("/people/" . $this->id . "/notes.xml");
         $xml_obj = simplexml_load_string($xml);
 
-        if ($this->client->debug == true)
-            ;
-        print_r($xml_obj);
+        if ($this->client->debug == true) {
+            print_r($xml_obj);
+        }
 
         if (isset($xml_obj->note) && count($xml_obj->note) > 0) {
             foreach ($xml_obj->note as $xml_note) {
@@ -130,12 +142,14 @@ class HighrisePerson {
         return $this->notes;
     }
 
-    public function delete() {
+    public function delete()
+    {
         $this->client->postDataWithVerb("/people/" . $this->getId() . ".xml", "", "DELETE");
         $this->client->checkForErrors("Person", 200);
     }
 
-    public function save() {
+    public function save()
+    {
         $person_xml = $this->toXML(false);
         if ($this->getId() != null) {
             $new_xml = $this->client->postDataWithVerb("/people/" . $this->getId() . ".xml?reload=true", $person_xml, "PUT");
@@ -157,39 +171,43 @@ class HighrisePerson {
         return true;
     }
 
-    public function saveTags() {
+    public function saveTags()
+    {
         if (is_array($this->tags)) {
             foreach ($this->tags as $tag_name => $tag) {
                 if ($tag->getId() == null) { // New Tag
-                    if ($this->client->debug)
+                    if ($this->client->debug) {
                         print "Adding Tag: " . $tag->getName() . "\n";
+                    }
 
                     $new_tag_data = $this->client->postDataWithVerb("/people/" . $this->getId() . "/tags.xml", "<name>" . $tag->getName() . "</name>", "POST");
                     $this->client->checkForErrors("Person (add tag)", array(200, 201));
                     $new_tag_data = simplexml_load_string($new_tag_data);
                     $this->tags[$tag_name]->setId($new_tag_data->id);
                     unset($this->original_tags[$tag->getId()]);
-                }
-                else { // Remove Tag from deletion list
+                } else { // Remove Tag from deletion list
                     unset($this->original_tags[$tag->getId()]);
                 }
             }
 
             if (is_array($this->original_tags)) {
                 foreach ($this->original_tags as $tag_id => $v) {
-                    if ($this->client->debug)
+                    if ($this->client->debug) {
                         print "REMOVE TAG: " . $tag_id;
+                    }
                     $new_tag_data = $this->client->postDataWithVerb("/people/" . $this->getId() . "/tags/" . $tag_id . ".xml", "", "DELETE");
                     $this->client->checkForErrors("Person (delete tag)", 200);
                 }
             }
 
-            foreach ($this->tags as $tag_name => $tag)
+            foreach ($this->tags as $tag_name => $tag) {
                 $this->original_tags[$tag->getId()] = 1;
+            }
         }
     }
 
-    public function addTag($v) {
+    public function addTag($v)
+    {
         if ($v instanceof HighriseTag && !isset($this->tags[$v->getName()])) {
             $this->tags[$v->getName()] = $v;
             $this->original_tags[$v->getId()] = 1;
@@ -201,10 +219,11 @@ class HighrisePerson {
     }
 
     /**
-     * 
+     *
      * @param string $tag You can either pass a tag name or a Tag instance
      */
-    public function removeTag($tag) {
+    public function removeTag($tag)
+    {
         if ($tag instanceof HighriseTag) {
             $name = $tag->getName();
         } else {
@@ -223,7 +242,8 @@ class HighrisePerson {
         unset($this->tags[$name]);
     }
 
-    public function toXML() {
+    public function toXML()
+    {
         $sxe = new \SimpleXMLElement('<person></person>');
         $sxe->addChild('id', $this->getId())->addAttribute('type', 'integer');
 
@@ -258,9 +278,11 @@ class HighrisePerson {
         return $sxe->asXML();
     }
 
-    public function loadFromXMLObject($xml_obj) {
-        if ($this->client->debug)
+    public function loadFromXMLObject($xml_obj)
+    {
+        if ($this->client->debug) {
             print_r($xml_obj);
+        }
 
         $this->setId($xml_obj->id);
         $this->setFirstName($xml_obj->{'first-name'});
@@ -278,7 +300,8 @@ class HighrisePerson {
         $this->loadTagsFromXMLObject($xml_obj->{'tags'});
     }
 
-    public function loadTagsFromXMLObject($xml_obj) {
+    public function loadTagsFromXMLObject($xml_obj)
+    {
         $this->original_tags = array();
         $this->tags = array();
 
@@ -290,7 +313,8 @@ class HighrisePerson {
         }
     }
 
-    public function loadContactDataFromXMLObject($xml_obj) {
+    public function loadContactDataFromXMLObject($xml_obj)
+    {
         $this->phone_numbers = array();
         $this->email_addresses = array();
         $this->web_addresses = array();
@@ -349,11 +373,13 @@ class HighrisePerson {
         }
     }
 
-    public function addAddress(HighriseAddress $address) {
+    public function addAddress(HighriseAddress $address)
+    {
         $this->addresses[] = $address;
     }
 
-    public function addEmailAddress($address, $location = "Home") {
+    public function addEmailAddress($address, $location = "Home")
+    {
         $item = new HighriseEmailAddress();
         $item->setAddress($address);
         $item->setLocation($location);
@@ -363,22 +389,19 @@ class HighrisePerson {
 
     public function removeEmailAddress($address)
     {
-        if ($this->email_addresses)
-        {
-          foreach ($this->email_addresses as $email)
-          {
-              if ($email->address == $address)
-              {
-                  $email->id = '-'.$email->id;
-              }
-          }
+        if ($this->email_addresses) {
+            foreach ($this->email_addresses as $email) {
+                if ($email->address == $address) {
+                    $email->id = '-' . $email->id;
+                }
+            }
         }
     }
 
     /**
      * Check if the person already has a given email address
-     * 
-     * @param string $address
+     *
+     * @param  string  $address
      * @return boolean
      */
     public function hasEmailAddress($address)
@@ -396,7 +419,8 @@ class HighrisePerson {
         return false;
     }
 
-    public function addPhoneNumber($number, $location = "Home") {
+    public function addPhoneNumber($number, $location = "Home")
+    {
         $item = new HighrisePhoneNumber();
         $item->setNumber($number);
         $item->setLocation($location);
@@ -404,7 +428,8 @@ class HighrisePerson {
         $this->phone_numbers[] = $item;
     }
 
-    public function addWebAddress($url, $location = "Work") {
+    public function addWebAddress($url, $location = "Work")
+    {
         $item = new HighriseWebAddress();
         $item->setUrl($url);
         $item->setLocation($location);
@@ -412,7 +437,8 @@ class HighrisePerson {
         $this->web_addresses[] = $item;
     }
 
-    public function addInstantMessenger($protocol, $address, $location = "Personal") {
+    public function addInstantMessenger($protocol, $address, $location = "Personal")
+    {
         $item = new HighriseInstantMessenger();
         $item->setProtocol($protocol);
         $item->setAddress($address);
@@ -421,7 +447,8 @@ class HighrisePerson {
         $this->instant_messengers[] = $item;
     }
 
-    public function addTwitterAccount($username, $location = "Personal") {
+    public function addTwitterAccount($username, $location = "Personal")
+    {
         $item = new HighriseTwitterAccount();
         $item->setUsername($username);
         $item->setLocation($location);
@@ -429,113 +456,139 @@ class HighrisePerson {
         $this->twitter_accounts[] = $item;
     }
 
-    public function setCompanyId($company_id) {
+    public function setCompanyId($company_id)
+    {
         $this->company_id = (string) $company_id;
     }
 
-    public function getCompanyId() {
+    public function getCompanyId()
+    {
         return $this->company_id;
     }
 
-    public function setVisibleTo($visible_to) {
+    public function setVisibleTo($visible_to)
+    {
         $valid_permissions = array("Everyone", "Owner");
         $visible_to = ucwords(strtolower($visible_to));
-        if ($visible_to != null && !in_array($visible_to, $valid_permissions))
+        if ($visible_to != null && !in_array($visible_to, $valid_permissions)) {
             throw new \Exception("$visible_to is not a valid visibility permission. Available visibility permissions: " . implode(", ", $valid_permissions));
+        }
 
         $this->visible_to = (string) $visible_to;
     }
 
-    public function getVisibleTo() {
+    public function getVisibleTo()
+    {
         return $this->visible_to;
     }
 
-    public function setAuthorId($author_id) {
+    public function setAuthorId($author_id)
+    {
         $this->author_id = (string) $author_id;
     }
 
-    public function getAuthorId() {
+    public function getAuthorId()
+    {
         return $this->author_id;
     }
 
-    public function setUpdatedAt($updated_at) {
+    public function setUpdatedAt($updated_at)
+    {
         $this->updated_at = (string) $updated_at;
     }
 
-    public function getUpdatedAt() {
+    public function getUpdatedAt()
+    {
         return $this->updated_at;
     }
 
-    public function setCreatedAt($created_at) {
+    public function setCreatedAt($created_at)
+    {
         $this->created_at = (string) $created_at;
     }
 
-    public function getCreatedAt() {
+    public function getCreatedAt()
+    {
         return $this->created_at;
     }
 
-    public function setCompanyName($company_name) {
+    public function setCompanyName($company_name)
+    {
         $this->company_name = (string) $company_name;
     }
 
-    public function getCompanyName() {
+    public function getCompanyName()
+    {
         return $this->company_name;
     }
 
-    public function setBackground($background) {
+    public function setBackground($background)
+    {
         $this->background = (string) $background;
     }
 
-    public function getBackground() {
+    public function getBackground()
+    {
         return $this->background;
     }
 
-    public function getFullName() {
+    public function getFullName()
+    {
         return $this->getFirstName() . " " . $this->getLastName();
     }
 
-    public function setLastName($last_name) {
+    public function setLastName($last_name)
+    {
         $this->last_name = (string) $last_name;
     }
 
-    public function getLastName() {
+    public function getLastName()
+    {
         return $this->last_name;
     }
 
-    public function setFirstName($first_name) {
+    public function setFirstName($first_name)
+    {
         $this->first_name = (string) $first_name;
     }
 
-    public function getFirstName() {
+    public function getFirstName()
+    {
         return $this->first_name;
     }
 
-    public function setTitle($title) {
+    public function setTitle($title)
+    {
         $this->title = (string) $title;
     }
 
-    public function getTitle() {
+    public function getTitle()
+    {
         return $this->title;
     }
 
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = (string) $id;
     }
 
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
-    public function setCustomField($subject_field_id, $value) {
+    public function setCustomField($subject_field_id, $value)
+    {
         $this->customFields[$subject_field_id] = $value;
     }
 
-    public function getCustomFields() {
+    public function getCustomFields()
+    {
         return $this->customFields;
     }
 
     /**
-     * 
+     *
      * @return \Highrise\Resources\HighriseCompany
      */
     public function getCompany()

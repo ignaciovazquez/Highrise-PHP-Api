@@ -2,13 +2,14 @@
 
 namespace Highrise\Resources;
 
-class HighrisePhoneNumber {
-
+class HighrisePhoneNumber
+{
     public $id;
     public $number;
     public $location;
 
-    public function __construct($id = null, $number = null, $location = null) {
+    public function __construct($id = null, $number = null, $location = null)
+    {
         $this->setId($id);
         $this->setNumber($number);
         $this->setLocation($location);
@@ -22,39 +23,46 @@ class HighrisePhoneNumber {
         $email_adress_node->addChild('location', $this->getLocation());
 
         return $xml_node;
-    }    
+    }
 
-    public function setLocation($location) {
+    public function setLocation($location)
+    {
         $valid_locations = array("Work", "Mobile", "Fax", "Pager", "Home", "Skype", "Other");
         $location = ucwords(strtolower($location));
-        if ($location != null && !in_array($location, $valid_locations))
+        if ($location != null && !in_array($location, $valid_locations)) {
             throw new \Exception("$location is not a valid location. Available locations: " . implode(", ", $valid_locations));
+        }
 
         $this->location = (string) $location;
     }
 
-    public function getLocation() {
+    public function getLocation()
+    {
         return $this->location;
     }
 
-    public function setNumber($number) {
+    public function setNumber($number)
+    {
         $this->number = (string) $number;
     }
 
-    public function getNumber() {
+    public function getNumber()
+    {
         return $this->number;
     }
 
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = (string) $id;
     }
 
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
-    public function __toString() {
+    public function __toString()
+    {
         return $this->number;
     }
-
 }

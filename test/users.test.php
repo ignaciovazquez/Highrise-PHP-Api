@@ -1,8 +1,9 @@
 <?php
-require_once("../lib/HighriseAPI.class.php");
+
+require_once '../lib/HighriseAPI.class.php';
 
 if (count($argv) != 3)
-	die("Usage: php users.test.php [account-name] [access-token]\n");
+    die("Usage: php users.test.php [account-name] [access-token]\n");
 
 $hr = new HighriseAPI();
 $hr->debug = false;
@@ -16,4 +17,3 @@ print_r($user);
 print "Finding all users...\n";
 $users = $hr->findAllUsers();
 print_r($users);
-

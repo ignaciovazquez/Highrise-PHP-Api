@@ -2,12 +2,13 @@
 
 namespace Highrise\Resources;
 
-class HighriseTag {
-
+class HighriseTag
+{
     public $id;
     public $name;
 
-    public function __construct($id = null, $name = null) {
+    public function __construct($id = null, $name = null)
+    {
         $this->setId($id);
         $this->setName($name);
     }
@@ -21,24 +22,28 @@ class HighriseTag {
         return $xml_node;
     }
 
-    public function __toString() {
+    public function __toString()
+    {
         return $this->name;
     }
 
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = (string) $name;
     }
 
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = (string) $id;
     }
 
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
-
 }

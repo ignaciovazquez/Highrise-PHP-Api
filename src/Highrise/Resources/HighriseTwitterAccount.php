@@ -2,13 +2,14 @@
 
 namespace Highrise\Resources;
 
-class HighriseTwitterAccount {
-
+class HighriseTwitterAccount
+{
     public $id;
     public $location;
     public $username;
 
-    public function __construct($id = null, $username = null, $location = null) {
+    public function __construct($id = null, $username = null, $location = null)
+    {
         $this->setId($id);
         $this->setUsername($username);
         $this->setLocation($location);
@@ -24,42 +25,50 @@ class HighriseTwitterAccount {
         return $xml_node;
     }
 
-    public function setUrl($url) {
+    public function setUrl($url)
+    {
         throw new \Exception("Cannot set URLs, change Username instead");
     }
 
-    public function getUrl() {
+    public function getUrl()
+    {
         return "http://twitter.com/" . $this->getUsername();
     }
 
-    public function setUsername($username) {
+    public function setUsername($username)
+    {
         $this->username = (string) $username;
         $this->url = $this->getUrl();
     }
 
-    public function getUsername() {
+    public function getUsername()
+    {
         return $this->username;
     }
 
-    public function setLocation($location) {
+    public function setLocation($location)
+    {
         $valid_locations = array("Business", "Personal", "Other");
         $location = ucwords(strtolower($location));
-        if ($location != null && !in_array($location, $valid_locations))
+        if ($location != null && !in_array($location, $valid_locations)) {
             throw new \Exception("$location is not a valid location. Available locations: " . implode(", ", $valid_locations));
+        }
 
         $this->location = (string) $location;
     }
 
-    public function getLocation() {
+    public function getLocation()
+    {
         return $this->location;
     }
 
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = (string) $id;
     }
 
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
-
 }

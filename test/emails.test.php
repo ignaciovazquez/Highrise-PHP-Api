@@ -1,8 +1,9 @@
 <?php
-require_once("../lib/HighriseAPI.class.php");
+
+require_once '../lib/HighriseAPI.class.php';
 
 if (count($argv) != 3)
-	die("Usage: php emails.test.php [account-name] [access-token]\n");
+    die("Usage: php emails.test.php [account-name] [access-token]\n");
 
 $hr = new HighriseAPI();
 $hr->debug = false;
@@ -13,10 +14,9 @@ $people = $hr->findPeopleBySearchTerm("Person Test");
 
 $person = $people[0];
 $emails = $person->getEmails();
-foreach($emails as $email)
-{
-	print_r($email);
-	print $email->toXML();
+foreach ($emails as $email) {
+    print_r($email);
+    print $email->toXML();
 }
 
 print $person->getId();
@@ -39,20 +39,16 @@ $new_email->save();
 
 $find_new_email = $hr->findEmailByID($new_email->id);
 if ($find_new_email->getBody() != $new_email->getBody())
-	throw new Exception("Retrieving a note by ID failed");
-	
+    throw new Exception("Retrieving a note by ID failed");
+
 $emails = $person->getEmails();
-foreach($emails as $email)
-{
-	if ($email->getTitle() == "Test Title")
-	{
-		print "Deleting: " . $email->id . "\n";
-		$email->delete();
-		$found_one = true;
-	}
-	
+foreach ($emails as $email) {
+    if ($email->getTitle() == "Test Title") {
+        print "Deleting: " . $email->id . "\n";
+        $email->delete();
+        $found_one = true;
+    }
 }
 
 if (!isset($found_one))
-	throw new Exception("Couldn't find created email");
-
+    throw new Exception("Couldn't find created email");

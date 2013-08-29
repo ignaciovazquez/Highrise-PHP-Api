@@ -1,8 +1,9 @@
 <?php
-require_once("../lib/HighriseAPI.class.php");
+
+require_once '../lib/HighriseAPI.class.php';
 
 if (count($argv) != 3)
-	die("Usage: php tags.test.php [account-name] [access-token]\n");
+    die("Usage: php tags.test.php [account-name] [access-token]\n");
 
 $hr = new HighriseAPI();
 $hr->debug = false;
@@ -10,8 +11,8 @@ $hr->setAccount($argv[1]);
 $hr->setToken($argv[2]);
 
 $people = $hr->findPeopleBySearchTerm("Tag Tagger");
-foreach($people as $p)
-	$p->delete();
+foreach ($people as $p)
+    $p->delete();
 
 print "Adding a new person...\n";
 
@@ -37,10 +38,9 @@ $people = $hr->findPeopleBySearchTerm("Tag Tagger");
 print_r($people);
 
 print "Remove tag-1 from all people named Tag Tagger...\n";
-foreach($people as $p)
-{
-	unset($p->tags['tag-1']);
-	$p->save();
+foreach ($people as $p) {
+    unset($p->tags['tag-1']);
+    $p->save();
 }
 
 print "Find People named Tag Tagger:\n";
@@ -53,8 +53,6 @@ $all_tags = $hr->findAllTags();
 print_r($all_tags);
 
 print "Cleaning up...\n";
-foreach($people as $p)
-{
-	$p->delete();
+foreach ($people as $p) {
+    $p->delete();
 }
-

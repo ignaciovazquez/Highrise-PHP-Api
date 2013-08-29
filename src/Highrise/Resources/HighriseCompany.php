@@ -14,25 +14,24 @@ use Highrise\Resources\HighriseTwitterAccount;
 
 class HighriseCompany
 {
-    public $id,
-            $name,
-            $background,
-            $created_at,
-            $updated_at,
-            $visible_to,
-            $owner_id,
-            $group_id,
-            $author_id,
-            $contact_details,
-            $email_addresses,
-            $phone_numbers,
-            $addresses,
-            $web_addresses,
-            $instant_messengers,
-            $twitter_accounts,
-            $tags,
-            $notes;
-
+    public $id;
+    public $name;
+    public $background;
+    public $created_at;
+    public $updated_at;
+    public $visible_to;
+    public $owner_id;
+    public $group_id;
+    public $author_id;
+    public $contact_details;
+    public $email_addresses;
+    public $phone_numbers;
+    public $addresses;
+    public $web_addresses;
+    public $instant_messengers;
+    public $twitter_accounts;
+    public $tags;
+    public $notes;
     private $original_tags;
 
     /**
@@ -99,9 +98,9 @@ class HighriseCompany
         $xml = $this->client->getURL("/companies/" . $this->id . "/emails.xml");
         $xml_obj = simplexml_load_string($xml);
 
-        if ($this->client->debug == true)
-            ;
-        print_r($xml_obj);
+        if ($this->client->debug == true) {
+            print_r($xml_obj);
+        }
 
         if (isset($xml_obj->email) && count($xml_obj->email) > 0) {
             foreach ($xml_obj->email as $xml_email) {
@@ -128,9 +127,9 @@ class HighriseCompany
         $xml = $this->client->getURL("/companies/" . $this->id . "/notes.xml");
         $xml_obj = simplexml_load_string($xml);
 
-        if ($this->client->debug == true)
-            ;
-        print_r($xml_obj);
+        if ($this->client->debug == true) {
+            print_r($xml_obj);
+        }
 
         if (isset($xml_obj->note) && count($xml_obj->note) > 0) {
             foreach ($xml_obj->note as $xml_note) {
@@ -185,8 +184,7 @@ class HighriseCompany
                     $new_tag_data = simplexml_load_string($new_tag_data);
                     $this->tags[$tag_name]->setId($new_tag_data->id);
                     unset($this->original_tags[$tag->getId()]);
-                }
-                else { // Remove Tag from deletion list
+                } else { // Remove Tag from deletion list
                     unset($this->original_tags[$tag->getId()]);
                 }
             }
@@ -200,8 +198,9 @@ class HighriseCompany
                 }
             }
 
-            foreach ($this->tags as $tag_name => $tag)
+            foreach ($this->tags as $tag_name => $tag) {
                 $this->original_tags[$tag->getId()] = 1;
+            }
         }
     }
 
@@ -279,8 +278,9 @@ class HighriseCompany
 
     public function loadFromXMLObject($xml_obj)
     {
-        if ($this->client->debug)
+        if ($this->client->debug) {
             print_r($xml_obj);
+        }
 
         $this->setId($xml_obj->id);
         $this->setName($xml_obj->{'name'});
@@ -485,8 +485,9 @@ class HighriseCompany
     {
         $valid_permissions = array("Everyone", "Owner");
         $visible_to = ucwords(strtolower($visible_to));
-        if ($visible_to != null && !in_array($visible_to, $valid_permissions))
+        if ($visible_to != null && !in_array($visible_to, $valid_permissions)) {
             throw new \Exception("$visible_to is not a valid visibility permission. Available visibility permissions: " . implode(", ", $valid_permissions));
+        }
 
         $this->visible_to = (string) $visible_to;
     }

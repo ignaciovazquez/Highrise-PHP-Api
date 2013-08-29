@@ -2,13 +2,14 @@
 
 namespace Highrise\Resources;
 
-class HighriseEmailAddress {
-
+class HighriseEmailAddress
+{
     public $id;
     public $address;
     public $location;
 
-    public function __construct($id = null, $address = null, $location = null) {
+    public function __construct($id = null, $address = null, $location = null)
+    {
         $this->setId($id);
         $this->setAddress($address);
         $this->setLocation($location);
@@ -24,37 +25,44 @@ class HighriseEmailAddress {
         return $xml_node;
     }
 
-    public function __toString() {
+    public function __toString()
+    {
         return $this->getAddress();
     }
 
-    public function setAddress($address) {
+    public function setAddress($address)
+    {
         $this->address = (string) $address;
     }
 
-    public function getAddress() {
+    public function getAddress()
+    {
         return $this->address;
     }
 
-    public function setLocation($location) {
+    public function setLocation($location)
+    {
         $valid_locations = array("Work", "Home", "Other");
         $location = ucwords(strtolower($location));
-        if ($location != null && !in_array($location, $valid_locations))
+        if ($location != null && !in_array($location, $valid_locations)) {
             throw new \Exception("$location is not a valid location. Available locations: " . implode(", ", $valid_locations));
+        }
 
         $this->location = (string) $location;
     }
 
-    public function getLocation() {
+    public function getLocation()
+    {
         return $this->location;
     }
 
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = (string) $id;
     }
 
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
-
 }

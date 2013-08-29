@@ -2,8 +2,8 @@
 
 namespace Highrise\Resources;
 
-class HighriseAddress {
-
+class HighriseAddress
+{
     public $id;
     public $city;
     public $country;
@@ -18,7 +18,7 @@ class HighriseAddress {
         $email_adress_node->addChild('id', $this->getId())->addAttribute('type', 'integer');
         $email_adress_node->addChild('city', $this->getCity());
         $email_adress_node->addChild('country', $this->getCountry());
-        $email_adress_node->addChild('location', $this->getLocation());        
+        $email_adress_node->addChild('location', $this->getLocation());
         $email_adress_node->addChild('state', $this->getState());
         $email_adress_node->addChild('street', $this->getStreet());
         $email_adress_node->addChild('zip', $this->getZip());
@@ -26,11 +26,13 @@ class HighriseAddress {
         return $xml_node;
     }
 
-    public function __toString() {
+    public function __toString()
+    {
         return $this->getFullAddress();
     }
 
-    public function getFullAddress() {
+    public function getFullAddress()
+    {
         $return = "";
         if ($this->getStreet() != "" && $this->getStreet() != null) {
             $return .= $this->getStreet() . ", ";
@@ -58,65 +60,79 @@ class HighriseAddress {
         return $return;
     }
 
-    public function setZip($zip) {
+    public function setZip($zip)
+    {
         $this->zip = (string) $zip;
     }
 
-    public function getZip() {
+    public function getZip()
+    {
         return $this->zip;
     }
 
-    public function setStreet($street) {
+    public function setStreet($street)
+    {
         $this->street = (string) $street;
     }
 
-    public function getStreet() {
+    public function getStreet()
+    {
         return $this->street;
     }
 
-    public function setState($state) {
+    public function setState($state)
+    {
         $this->state = (string) $state;
     }
 
-    public function getState() {
+    public function getState()
+    {
         return $this->state;
     }
 
-    public function setLocation($location) {
+    public function setLocation($location)
+    {
         $valid_locations = array("Work", "Home", "Other");
         $location = ucwords(strtolower($location));
-        if ($location != null && !in_array($location, $valid_locations))
+        if ($location != null && !in_array($location, $valid_locations)) {
             throw new \Exception("$location is not a valid location. Available locations: " . implode(", ", $valid_locations));
+        }
 
         $this->location = (string) $location;
     }
 
-    public function getLocation() {
+    public function getLocation()
+    {
         return $this->location;
     }
 
-    public function setCountry($country) {
+    public function setCountry($country)
+    {
         $this->country = (string) $country;
     }
 
-    public function getCountry() {
+    public function getCountry()
+    {
         return $this->country;
     }
 
-    public function setCity($city) {
+    public function setCity($city)
+    {
         $this->city = (string) $city;
     }
 
-    public function getCity() {
+    public function getCity()
+    {
         return $this->city;
     }
 
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = (string) $id;
     }
 
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
-
 }

@@ -4,25 +4,29 @@ namespace Highrise\Resources;
 
 use Highrise\HighriseAPI;
 
-class HighriseEmail extends HighriseNote {
-
+class HighriseEmail extends HighriseNote
+{
     public $title;
 
-    public function setTitle($title) {
+    public function setTitle($title)
+    {
         $this->title = (string) $title;
     }
 
-    public function getTitle() {
+    public function getTitle()
+    {
         return $this->title;
     }
 
-    public function __construct(HighriseAPI $highrise) {
+    public function __construct(HighriseAPI $highrise)
+    {
         parent::__construct($highrise);
         $this->_note_type = "email";
         $this->_note_url = "/emails";
     }
 
-    public function loadFromXMLObject($xml_obj) {
+    public function loadFromXMLObject($xml_obj)
+    {
         $this->setId($xml_obj->{'id'});
         $this->setAuthorId($xml_obj->{'author-id'});
         $this->setOwnerId($xml_obj->{'owner-id'});
@@ -37,5 +41,4 @@ class HighriseEmail extends HighriseNote {
 
         return true;
     }
-
 }
