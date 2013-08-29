@@ -233,7 +233,9 @@ class HighriseCompany
             }
 
             // Tag not found
-            return;
+            if ($tag != $name) {
+                return;
+            }
         }
 
         unset($this->tags[$name]);
