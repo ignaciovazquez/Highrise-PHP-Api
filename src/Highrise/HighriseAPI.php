@@ -479,7 +479,7 @@ class HighriseAPI {
 
     // Companies
 
-    public function findCompanyById() {
+    public function findCompanyById($id) {
         $xml = $this->getURL("/companies/$id.xml");
 
         $this->checkForErrors("Company");
