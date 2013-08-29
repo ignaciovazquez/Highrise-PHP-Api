@@ -225,7 +225,7 @@ class HighrisePerson {
         $sxe = new \SimpleXMLElement('<person></person>');
         $sxe->addChild('id', $this->getId())->addAttribute('type', 'integer');
 
-        $fields = array("title", "first_name", "last_name", "background", "visible_to", "company_name");
+        $fields = array("title", "first_name", "last_name", "background", "visible_to", "company_name", "company_id");
         foreach ($fields as $field) {
             $xml_field_name = str_replace("_", "-", $field);
             $sxe->addChild($xml_field_name, $this->$field);
