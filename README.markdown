@@ -28,7 +28,7 @@ Create a new person and set his address
 	$person->addEmailAddress("johndoe@gmail.com");
 	
 	$address = new HighriseAddress();
-	$address->setAddress("165 Test St.");
+	$address->setStreet("165 Test St.");
 	$address->setCity("Glasgow");
 	$address->setCountry("Scotland");
 	$address->setZip("GL1");
