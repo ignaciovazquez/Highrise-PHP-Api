@@ -646,7 +646,7 @@
 		
 		public function setFrame($subject_type)
 		{
-			$valid_frames = array("today", "tomorrow", "this_week", "next_week", "later", "overdue");
+			$valid_frames = array("today", "tomorrow", "this_week", "next_week", "later", "overdue", "specific");
 			$frame = str_replace(" ", "_", strtolower($subject_type));
 			
 			if ($frame != null && !in_array($frame, $valid_frames))
