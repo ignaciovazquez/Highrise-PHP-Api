@@ -287,7 +287,7 @@
 			}
 			
 			if (!isset($tag_id))
-				throw new Excepcion("Tag $tag_name not found");
+				throw new Exception("Tag $tag_name not found");
 			
 			return $this->findPeopleByTagId($tag_id);
 		}
@@ -1634,6 +1634,7 @@
 		// TODO: public $owner_id;
 		// TODO: public $group_id;
 		public $author_id;
+		public $avatar_url;
 		public $contact_details;
 		public $visible_to;
 		
@@ -1902,6 +1903,7 @@
 			$this->setFirstName($xml_obj->{'first-name'});
 			$this->setLastName($xml_obj->{'last-name'});
 			$this->setTitle($xml_obj->{'title'});
+			$this->setAvatarUrl($xml_obj->{'avatar-url'});
 			$this->setAuthorId($xml_obj->{'author-id'});
 			$this->setBackground($xml_obj->{'background'});
 			$this->setVisibleTo($xml_obj->{'visible-to'});	
@@ -2078,6 +2080,16 @@
 		  return $this->visible_to;
 		}
 		
+		public function setAvatarUrl($avatar_url)
+		{
+		  $this->avatar_url = (string)$avatar_url;
+		}
+
+		public function getAvatarUrl()
+		{
+		  return $this->avatar_url;
+		}
+	
 		public function setAuthorId($author_id)
 		{
 		  $this->author_id = (string)$author_id;
