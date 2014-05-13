@@ -292,6 +292,10 @@ class HighriseCompany
         $this->setCreatedAt($xml_obj->{'created-at'});
         $this->setUpdatedAt($xml_obj->{'updated-at'});
 
+        foreach($xml_obj->subject_datas->subject_data as $custom_field){
+            $this->setCustomField((string) $custom_field->subject_field_label, (string) $custom_field->value); 
+        } 
+
         $this->loadContactDataFromXMLObject($xml_obj->{'contact-data'});
         $this->loadTagsFromXMLObject($xml_obj->{'tags'});
     }
