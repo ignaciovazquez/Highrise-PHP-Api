@@ -32,6 +32,7 @@ Create a new person and set his address
 	$address->setCity("Glasgow");
 	$address->setCountry("Scotland");
 	$address->setZip("GL1");
+	$address->setLocation("Work");
 	$person->addAddress($address);
 	
 	$person->save();
